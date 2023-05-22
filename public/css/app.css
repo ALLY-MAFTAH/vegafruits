@@ -1,0 +1,91 @@
+.products-container {
+    display: grid;
+    grid-gap: 10px;
+    padding-bottom: 60px;
+}
+
+@media (min-width: 768px) {
+    .products-container {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+@media (max-width: 767px) {
+    .products-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 55px;
+    background-color: rgb(5, 134, 39);
+    z-index: 999;
+    /* set a high z-index to make it appear on top of other elements */
+}
+
+
+.profile-image {
+    border-radius: 50%;
+    overflow: hidden;
+    width: 40px;
+    height: 40px;
+}
+
+.form-switch .form-check-input {
+    width: 3.5em !important;
+}
+
+.form-check .form-check-input {
+    float: none !important;
+
+}
+
+.form-check-input {
+    height: 25px !important;
+    margin-top: 0 !important;
+}
+
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.number-input {
+    position: relative;
+    width: fit-content;
+}
+
+#quantity-input {
+    width: 65px;
+    height: 30px;
+    border-radius: 4px;
+}
+
+.spinners {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    margin-right: 0.5px;
+    transform: translateY(-50%);
+}
+
+.spinner {
+    border-radius: 4px !important;
+    font-size: 7px;
+    border: none;
+    padding: 1 2px;
+}
+
+.spinner:hover {
+    background: lightgrey;
+}
