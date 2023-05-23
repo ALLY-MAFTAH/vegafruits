@@ -19,7 +19,17 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
 
-    <!-- Scripts -->
+    <style>
+        .ui-dialog .ui-dialog-title {
+            text-align: center;
+            color: rgb(62, 2, 93);
+        }
+
+        hr {
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+    </style>
 </head>
 
 <body>
@@ -112,7 +122,7 @@
         <footer>
             <div class="row pt-2 text-center">
                 <div class="col text-center">
-                    <button class="btn btn-light">Contacts</button>
+                    <button id="open-dialog" class="btn btn-light">Contacts</button>
                 </div>
                 <div class="col text-center">
                     <button data-bs-toggle="modal" data-bs-target="#cartModal" style="position: relative; width: 150px;"
@@ -126,7 +136,8 @@
                     </button>
                 </div>
                 <div class="col text-center">
-                    <button class="btn btn-light">About Us</button>
+                    <button data-bs-toggle="modal" data-bs-target="#aboutModal" class="btn btn-light">About
+                        Us</button>
                 </div>
             </div>
         </footer>
@@ -181,6 +192,61 @@
             </div>
         </div>
     </div>
+
+    {{-- CONTACTS DIALOG --}}
+    <div id="dialog-container">
+        <div id="contact-dialog" title="Contacts">
+            <div class="text-center text-success py-1">
+                Keep in touch with us through our quick links
+            </div>
+            <hr>
+            <div class="px-5">
+                <a href="" style="text-decoration: none; color:rgb(64, 8, 72);font-weight:bold">
+                    <div class="row" style="font-size: 20px">
+                        <div class="col-2">
+                            <i style="font-size: 30px" class="fa fa-phone"></i>
+                        </div>
+                        <div class="col-10">+255714871033</div>
+                    </div>
+                </a>
+                <hr> <a href="" style="text-decoration: none; color:green;font-weight:bold">
+                    <div class="row" style="font-size: 20px">
+                        <div class="col-2">
+                            <i style="font-size: 30px;" class="fa fa-whatsapp"></i>
+                        </div>
+                        <div class="col-10">+255714871033</div>
+                    </div>
+                </a>
+                <hr>
+                <a href="" style="text-decoration: none; color:purple;font-weight:bold">
+                    <div class="row" style="font-size: 20px">
+                        <div class="col-2">
+                            <i style="font-size: 30px;" class="fa fa-instagram"></i>
+                        </div>
+                        <div class="col-10">+255714871033</div>
+                    </div>
+                </a>
+                <hr>
+                <a href="" style="text-decoration: none; color:blue;font-weight:bold">
+                    <div class="row" style="font-size: 20px">
+                        <div class="col-2">
+                            <i style="font-size: 30px;" class="fa fa-facebook"></i>
+                        </div>
+                        <div class="col-10">+255714871033</div>
+                    </div>
+                </a>
+                <hr> <a href="" style="text-decoration: none; color:rgb(52, 153, 240);font-weight:bold">
+                    <div class="row" style="font-size: 20px">
+                        <div class="col-2">
+                            <i style="font-size: 30px;" class="fa fa-twitter"></i>
+                        </div>
+                        <div class="col-10">+255714871033</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
 
     {{-- SCRIPTS --}}
 
@@ -465,6 +531,43 @@
             return cartTable;
         }
     </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var dialogContainer = document.getElementById("dialog-container");
+            var dialog = document.getElementById("contact-dialog");
+            dialog.style.display = "none";
+
+            var openButton = document.getElementById("open-dialog");
+            openButton.addEventListener("click", function() {
+                $(dialogContainer).show("fade", 400);
+                $(dialog).dialog({
+                    modal: true,
+                    width: "auto",
+                    show: {
+                        effect: "fade",
+                        duration: 400
+                    },
+                    hide: {
+                        effect: "fade",
+                        duration: 400
+                    },
+                    open: function(event, ui) {
+                        $(this).parent().find(".ui-dialog-titlebar-close").hide();
+                    },
+                    buttons: [{
+                        text: "Close",
+                        class: "btn btn-outline-warning m-0",
+                        click: function() {
+                            $(dialog).dialog("close");
+                            $(dialogContainer).hide("fade", 400);
+                        }
+                    }]
+                });
+            });
+        });
+    </script>
+
+
 </body>
 
 </html>

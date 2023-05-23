@@ -94,9 +94,7 @@ class StockController extends Controller
     }
     public function deleteStock(Stock $stock)
     {
-
         $stock->delete();
-
 
         $product = new ProductController();
         $product->deleteProduct($stock->product);

@@ -125,9 +125,6 @@ class ProductController extends Controller
 
         $itsName = $product->name;
         $product->delete();
-
-
-        notify()->success('You have successful deleted ' . $itsName . '.');
         return back();
     }
 }
