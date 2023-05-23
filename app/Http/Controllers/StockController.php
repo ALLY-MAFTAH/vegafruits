@@ -90,7 +90,7 @@ class StockController extends Controller
 
         $stock->update($attributes);
 
-        return back()->with('success', "Stock status updated successful");
+        return back()->with('success', "Product status updated successful");
     }
     public function deleteStock(Stock $stock)
     {
@@ -99,6 +99,6 @@ class StockController extends Controller
         $product = new ProductController();
         $product->deleteProduct($stock->product);
 
-        return back()->with('success', "Stock deleted successful");
+        return back()->with('success', "Product deleted successful");
     }
 }

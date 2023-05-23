@@ -201,7 +201,7 @@
             </div>
             <hr>
             <div class="px-5">
-                <a href="" style="text-decoration: none; color:rgb(64, 8, 72);font-weight:bold">
+                <a href="tel:+255714871033" style="text-decoration: none; color:rgb(64, 8, 72);font-weight:bold">
                     <div class="row" style="font-size: 20px">
                         <div class="col-2">
                             <i style="font-size: 30px" class="fa fa-phone"></i>
@@ -209,7 +209,8 @@
                         <div class="col-10">+255714871033</div>
                     </div>
                 </a>
-                <hr> <a href="" style="text-decoration: none; color:green;font-weight:bold">
+                <hr>
+                <a href="https://api.whatsapp.com/send?phone=255714871033" style="text-decoration: none; color:green;font-weight:bold">
                     <div class="row" style="font-size: 20px">
                         <div class="col-2">
                             <i style="font-size: 30px;" class="fa fa-whatsapp"></i>
@@ -218,32 +219,34 @@
                     </div>
                 </a>
                 <hr>
-                <a href="" style="text-decoration: none; color:purple;font-weight:bold">
+                <a href="https://www.instagram.com/" style="text-decoration: none; color:rgb(193, 11, 193);font-weight:bold">
                     <div class="row" style="font-size: 20px">
                         <div class="col-2">
                             <i style="font-size: 30px;" class="fa fa-instagram"></i>
                         </div>
-                        <div class="col-10">+255714871033</div>
+                        <div class="col-10">vegafruits</div>
                     </div>
                 </a>
                 <hr>
-                <a href="" style="text-decoration: none; color:blue;font-weight:bold">
+                <a href="https://www.facebook.com/" style="text-decoration: none; color:blue;font-weight:bold">
                     <div class="row" style="font-size: 20px">
                         <div class="col-2">
                             <i style="font-size: 30px;" class="fa fa-facebook"></i>
                         </div>
-                        <div class="col-10">+255714871033</div>
+                        <div class="col-10">Vega Fruits</div>
                     </div>
                 </a>
-                <hr> <a href="" style="text-decoration: none; color:rgb(52, 153, 240);font-weight:bold">
+                <hr>
+                <a href="https://twitter.com/" style="text-decoration: none; color:rgb(52, 153, 240);font-weight:bold">
                     <div class="row" style="font-size: 20px">
                         <div class="col-2">
                             <i style="font-size: 30px;" class="fa fa-twitter"></i>
                         </div>
-                        <div class="col-10">+255714871033</div>
+                        <div class="col-10">vegafruits</div>
                     </div>
                 </a>
             </div>
+
         </div>
     </div>
 
