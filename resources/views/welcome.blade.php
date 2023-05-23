@@ -122,7 +122,7 @@
         <footer>
             <div class="row pt-2 text-center">
                 <div class="col text-center">
-                    <button id="open-dialog" class="btn btn-light">Contacts</button>
+                    <button id="contact-open-dialog" class="btn btn-light">Contacts</button>
                 </div>
                 <div class="col text-center">
                     <button data-bs-toggle="modal" data-bs-target="#cartModal" style="position: relative; width: 150px;"
@@ -136,8 +136,7 @@
                     </button>
                 </div>
                 <div class="col text-center">
-                    <button data-bs-toggle="modal" data-bs-target="#aboutModal" class="btn btn-light">About
-                        Us</button>
+                    <button id="about-open-dialog" class="btn btn-light">About Us</button>
                 </div>
             </div>
         </footer>
@@ -194,8 +193,8 @@
     </div>
 
     {{-- CONTACTS DIALOG --}}
-    <div id="dialog-container">
-        <div id="contact-dialog" title="Contacts">
+    <div id="contact-dialog-container">
+        <div id="contact-dialog" title="Contact Us">
             <div class="text-center text-success py-1">
                 Keep in touch with us through our quick links
             </div>
@@ -210,7 +209,8 @@
                     </div>
                 </a>
                 <hr>
-                <a href="https://api.whatsapp.com/send?phone=255714871033" style="text-decoration: none; color:green;font-weight:bold">
+                <a href="https://api.whatsapp.com/send?phone=255714871033"
+                    style="text-decoration: none; color:green;font-weight:bold">
                     <div class="row" style="font-size: 20px">
                         <div class="col-2">
                             <i style="font-size: 30px;" class="fa fa-whatsapp"></i>
@@ -219,7 +219,8 @@
                     </div>
                 </a>
                 <hr>
-                <a href="https://www.instagram.com/" style="text-decoration: none; color:rgb(193, 11, 193);font-weight:bold">
+                <a href="https://www.instagram.com/"
+                    style="text-decoration: none; color:rgb(193, 11, 193);font-weight:bold">
                     <div class="row" style="font-size: 20px">
                         <div class="col-2">
                             <i style="font-size: 30px;" class="fa fa-instagram"></i>
@@ -237,7 +238,8 @@
                     </div>
                 </a>
                 <hr>
-                <a href="https://twitter.com/" style="text-decoration: none; color:rgb(52, 153, 240);font-weight:bold">
+                <a href="https://twitter.com/"
+                    style="text-decoration: none; color:rgb(52, 153, 240);font-weight:bold">
                     <div class="row" style="font-size: 20px">
                         <div class="col-2">
                             <i style="font-size: 30px;" class="fa fa-twitter"></i>
@@ -250,10 +252,26 @@
         </div>
     </div>
 
+    {{-- ABOUT US DIALOG --}}
+
+    <div id="about-dialog-container">
+        <div id="about-dialog" title="About Us">
+            <div class="text-center text-success py-1">
+                Vegafruits Tanzania Limited
+            </div>
+            <hr>
+            <div class="px-5">
+
+                <h2>SISI NDIO SISI</h2>
+
+            </div>
+
+        </div>
+    </div>
 
     {{-- SCRIPTS --}}
-
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
     <script>
         $.ajaxSetup({
             headers: {
@@ -534,41 +552,81 @@
             return cartTable;
         }
     </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            var dialogContainer = document.getElementById("dialog-container");
-            var dialog = document.getElementById("contact-dialog");
-            dialog.style.display = "none";
 
-            var openButton = document.getElementById("open-dialog");
-            openButton.addEventListener("click", function() {
-                $(dialogContainer).show("fade", 400);
-                $(dialog).dialog({
-                    modal: true,
-                    width: "auto",
-                    show: {
-                        effect: "fade",
-                        duration: 400
-                    },
-                    hide: {
-                        effect: "fade",
-                        duration: 400
-                    },
-                    open: function(event, ui) {
-                        $(this).parent().find(".ui-dialog-titlebar-close").hide();
-                    },
-                    buttons: [{
-                        text: "Close",
-                        class: "btn btn-outline-warning m-0",
-                        click: function() {
-                            $(dialog).dialog("close");
-                            $(dialogContainer).hide("fade", 400);
-                        }
-                    }]
-                });
-            });
-        });
-    </script>
+
+<script>
+  $(document).ready(function() {
+    var openDialog = function(dialogContainer, dialog) {
+      dialogContainer.show("fade", 400);
+      dialog.dialog("open");
+    };
+
+    var closeDialog = function(dialogContainer, dialog) {
+      dialog.dialog("close");
+      dialogContainer.hide("fade", 400);
+    };
+
+    var aboutDialogContainer = $("#about-dialog-container");
+    var aboutDialog = $("#about-dialog").dialog({
+      autoOpen: false,
+      modal: true,
+      width: "auto",
+      show: {
+        effect: "fade",
+        duration: 400
+      },
+      hide: {
+        effect: "fade",
+        duration: 400
+      },
+      open: function(event, ui) {
+        $(this).parent().find(".ui-dialog-titlebar-close").hide();
+      },
+      buttons: [{
+        text: "Close",
+        class: "btn btn-outline-warning m-0",
+        click: function() {
+          closeDialog(aboutDialogContainer, aboutDialog);
+        }
+      }]
+    });
+
+    var contactDialogContainer = $("#contact-dialog-container");
+    var contactDialog = $("#contact-dialog").dialog({
+      autoOpen: false,
+      modal: true,
+      width: "auto",
+      show: {
+        effect: "fade",
+        duration: 400
+      },
+      hide: {
+        effect: "fade",
+        duration: 400
+      },
+      open: function(event, ui) {
+        $(this).parent().find(".ui-dialog-titlebar-close").hide();
+      },
+      buttons: [{
+        text: "Close",
+        class: "btn btn-outline-warning m-0",
+        click: function() {
+          closeDialog(contactDialogContainer, contactDialog);
+        }
+      }]
+    });
+
+    $("#about-open-dialog").on("click", function() {
+      closeDialog(contactDialogContainer, contactDialog);
+      openDialog(aboutDialogContainer, aboutDialog);
+    });
+
+    $("#contact-open-dialog").on("click", function() {
+      closeDialog(aboutDialogContainer, aboutDialog);
+      openDialog(contactDialogContainer, contactDialog);
+    });
+  });
+</script>
 
 
 </body>
