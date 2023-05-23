@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=0.9">
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -87,16 +87,17 @@
                 @foreach ($stocks as $stock)
                     <div class="card shadow">
                         <div class="card-body text-center">
-                            <img src="{{ asset('storage/' . $stock->product->photo) }}" height="150px" width="150px"
-                                alt="">
+                            <div class="drag-image-container">
+                                <img src="{{ asset('storage/' . $stock->product->photo) }}" height="150px"
+                                    width="150px" alt="">
+                            </div>
                             <div>{{ $stock->name }}</div>
                             <h5 class="text-info"><b>{{ $stock->product->volume }}</b> {{ $stock->unit }}</h5>
                             <h5 class="text-success">
                                 <b>{{ number_format($stock->product->selling_price, 0, '.', ',') }} Tsh</b>
                             </h5>
                             <button class="btn btn-outline-warning add-to-cart"
-                                id="add-to-cart-{{ $stock->product->id }}" data-product-id="{{ $stock->product->id }}"
-                                data-product-name="{{ $stock->name }}"
+                                data-product-id="{{ $stock->product->id }}" data-product-name="{{ $stock->name }}"
                                 data-product-price="{{ $stock->product->selling_price }}"
                                 data-product-quantity="{{ $stock->product->volume }}"
                                 data-product-volume="{{ $stock->product->volume }}"
@@ -106,7 +107,6 @@
                         </div>
                     </div>
                 @endforeach
-
             </div>
         </main>
         <footer>
@@ -124,12 +124,10 @@
                             <b class="cart-price text-white">0</b> Tsh
                         </div>
                     </button>
-
                 </div>
                 <div class="col text-center">
                     <button class="btn btn-light">About Us</button>
                 </div>
-
             </div>
         </footer>
     </div>
@@ -140,12 +138,12 @@
                 <div class="modal-header">
                     <div class="modal-title text-center" id="exampleModalLabel">
                         <div class="text-center">
-                            <div style="position: relative; width: 150px;" class="btn btn-warning">
+                            <div style="border-radius:0px" class=" px-3 py-1 bg-warning">
                                 <div>
                                     <i class="fa fa-shopping-cart fa-lg"></i>
                                     <span class="cart-quantity"
-                                        style="position: absolute; top: -10px; left: -10px; background-color: red; color: white; border-radius: 50%; padding: 2px 10px;">0</span>
-                                    <b class="text-dark">Your Cart</b>
+                                        style="position: absolute; top: 3px; left: 3px; background-color: red; color: white; border-radius: 50%; padding: 2px 10px;">0</span>
+                                    <b class="text-dark">Your Order</b>
                                 </div>
                             </div>
                         </div>
@@ -158,21 +156,23 @@
                         {{-- TABLE SCRIPTS LOAD HERE --}}
 
                     </div>
-                    <div class="row mb-1 mt-2">
-                        <div class="text-center">
-                            <button data-bs-toggle="modal" data-bs-target="#cartModal" style=""
-                                class="shadow btn btn-white">
-                                <h5 style="font-weight:bold;"class=" text-success">
-                                    <span>Grand Total: </span>&nbsp;&nbsp;
+                    <div class="row">
+                        <div class="col-md-3"></div>
+                        <div class="col-md-6 text-center">
+                            <div class="card px-2 mx-1 py-2 shadow" style="border-radius: 3px">
+                                <div class="div" style="font-size:20px;font-weight:bold">
+                                    <span>Total: </span>&nbsp;
                                     <span class="cart-price text-success">0</span>&nbsp; Tsh
-                                </h5>
-                            </button>
+                                </div>
+                            </div>
                         </div>
+                        <div class="col-md-3"></div>
                     </div>
+
                     <div class="row mb-1 mt-2">
                         <div class="text-center">
                             <a href="#" class="btn btn-danger empty-cart-btn">{{ __('Empty Cart') }}</a>
-                            &nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                             <a href="#" class="btn checkout-btn"
                                 style="color:white;background: rgb(3, 174, 3)">{{ __('Checkout') }}</a>
                         </div>
@@ -184,6 +184,7 @@
 
     {{-- SCRIPTS --}}
 
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
         $.ajaxSetup({
             headers: {
@@ -214,6 +215,25 @@
             var productQuantity = parseFloat($(this).data('product-quantity'));
             var productVolume = parseFloat($(this).data('product-volume'));
 
+            var img = $(this).closest('.card-body').find('img').clone();
+            img.css({
+                'position': 'absolute',
+                'z-index': '1000',
+                'top': $(this).closest('.card-body').offset().top,
+                'left': $(this).closest('.card-body').offset().left,
+                'width': $(this).closest('.card-body').outerWidth(),
+                'height': $(this).closest('.card-body').outerHeight()
+            });
+            $('body').append(img);
+            img.animate({
+                top: $(".cart-price").offset().top,
+                left: $(".cart-price").offset().left,
+                width: 20,
+                height: 20
+            }, 1000, function() {
+                img.remove();
+            });
+
             $.ajax({
                 type: 'POST',
                 url: '/cart/add',
@@ -227,8 +247,9 @@
                 success: function(response) {
                     if (response.success) {
                         var quantity = response.totalQuantity;
-                        var price = response.totalPrice.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,
-                        ",");
+                        var price = response.totalPrice.toFixed(0).replace(
+                            /\B(?=(\d{3})+(?!\d))/g,
+                            ",");
                         $(".cart-quantity").text(quantity);
                         $(".cart-price").text(price);
                         var cartItems = response.cart;
@@ -242,7 +263,6 @@
                     console.log('Error:', error);
                 }
             });
-
         });
 
         $(document).on('click', '.remove-item', function() {
@@ -352,7 +372,8 @@
                 },
                 success: function(response) {
                     var quantity = response.totalQuantity;
-                    var price = response.totalPrice.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    var price = response.totalPrice.toFixed(0).replace(
+                        /\B(?=(\d{3})+(?!\d))/g, ",");
                     $('.cart-quantity').text(quantity);
                     $('.cart-price').text(price);
                     var cartItems = response.cart;
@@ -388,16 +409,19 @@
 
             for (var cartItem in cartItems) {
 
-                var total = (cartItems[cartItem].price * cartItems[cartItem].quantity) / cartItems[cartItem].volume;
+                var total = (cartItems[cartItem].price * cartItems[cartItem].quantity) / cartItems[cartItem]
+                    .volume;
                 cartTableHtml += '<tr>';
                 cartTableHtml += '<td>' + cartItems[cartItem].name + '</td>';
-                cartTableHtml += '<td>' + cartItems[cartItem].price.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",") +
+                cartTableHtml += '<td>' + cartItems[cartItem].price.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,
+                        ",") +
                     '</td>';
                 cartTableHtml += '<td><div class="number-input">';
                 cartTableHtml +=
                     '<input id="quantity-input" type="number" class="form-control update-cart-quantity" min="' +
                     cartItems[
-                        cartItem].volume + '" max="' + cartItems[cartItem].remainedQuantity + '" value="' + cartItems[
+                        cartItem].volume + '" max="' + cartItems[cartItem].remainedQuantity + '" value="' +
+                    cartItems[
                         cartItem].quantity + '" data-product-id="' +
                     cartItem +
                     '">';
@@ -405,10 +429,12 @@
                 cartTableHtml += '<button class="spinner increment">&#9650;</button>';
                 cartTableHtml += '<button class="spinner decrement">&#9660;</button>';
                 cartTableHtml += '</div></div></td>';
-                cartTableHtml += '<td class="text-end">' + total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",") +
+                cartTableHtml += '<td class="text-end">' + total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,
+                        ",") +
                     '</td>';
-                cartTableHtml += '<td><a type="button" class="btn-danger remove-item" data-product-id="' + cartItem +
-                    '"><i class="fa fa-trash " style="color:red"></i></a></td>';
+                cartTableHtml += '<td><a type="button" class="btn-danger remove-item" data-product-id="' +
+                    cartItem +
+                    '"><i class="fa fa-trash " style="font-size:19px;color:red"></i></a></td>';
                 cartTableHtml += '</tr>';
 
             }
