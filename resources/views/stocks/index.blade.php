@@ -179,7 +179,7 @@
                             <th>Quantity</th>
                             <th class="text-right">Buying Price</th>
                             <th class="text-right">Selling Price</th>
-                            <th>Last Updated</th>
+                            {{-- <th>Last Updated</th> --}}
                             <th class="text-center">Discount</th>
                             <th class="text-center">Status</th>
                             <th class="text-center">Actions</th>
@@ -212,7 +212,7 @@
                                     {{ number_format($stock->product->selling_price, 0, '.', ',') }}
                                     Tsh
                                 </td>
-                                <td class="">{{ $stock->updated_at->format('D, d M Y \a\t H:i:s') }} </td>
+                                {{-- <td class="">{{ $stock->updated_at->format('D, d M Y \a\t H:i:s') }} </td> --}}
 
                                 <td class="text-center">
                                     <form id="toggle-status-form-{{ $stock->product->id }}" method="POST"
@@ -228,7 +228,7 @@
                                         @csrf
                                         @method('PUT')
                                     </form>
-                                <td>
+                                </td>
                                 <td class="text-center">
                                     <form id="toggle-status-form-{{ $stock->id }}" method="POST" class="px-2"
                                         action="{{ route('stocks.toggle-status', $stock) }}">
@@ -242,6 +242,8 @@
                                         @csrf
                                         @method('PUT')
                                     </form>
+                                </td>
+                                <td class="text-center">
                                     <a href="{{ route('stocks.show', $stock) }}"
                                         class="btn btn-sm btn-outline-info collapsed mx-2" type="button">
                                         <i class="feather icon-edit"></i> View
@@ -260,144 +262,25 @@
                                         action="{{ route('stocks.delete', $stock) }}">
                                         @csrf @method('delete')
                                     </form>
-
-                                    <div class="modal modal-sm fade" id="editModal-{{ $stock->id }}" tabindex="-1"
-                                        aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="exampleModalLabel">Edit Product in
-                                                        Stock
-                                                    </h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                        aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <form method="POST" action="{{ route('stocks.edit', $stock) }}">
-                                                        @method('PUT')
-                                                        @csrf
-                                                        <div class="text-start mb-1">
-                                                            <label for="name"
-                                                                class=" col-form-label text-sm-start">{{ __('Name') }}</label>
-                                                            <div class="input-group">
-                                                                <input id="name" type="text" placeholder=""
-                                                                    class="form-control @error('name') is-invalid @enderror"
-                                                                    name="name"
-                                                                    value="{{ old('name', $stock->name) }}" required
-                                                                    autocomplete="name" autofocus style="float: left;">
-                                                                <select class="form-control form-select" name="type"
-                                                                    required
-                                                                    style="float: left;max-width:115px; width: inaitial; background-color:rgb(238, 238, 242)">
-                                                                    <option value="Water"
-                                                                        {{ $stock->type == 'Water' ? 'selected' : '' }}>
-                                                                        Water</option>
-                                                                    <option value="Juice"
-                                                                        {{ $stock->type == 'Juice' ? 'selected' : '' }}>
-                                                                        Juice</option>
-                                                                </select>
-                                                                @error('name')
-                                                                    <span class="invalid-feedback" role="alert">
-                                                                        <strong>{{ $message }}</strong>
-                                                                    </span>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-                                                        <div class="text-start mb-1">
-                                                            <label for="volume"
-                                                                class=" col-form-label text-sm-start">{{ __('Volume') }}</label>
-                                                            <div class="input-group">
-                                                                <input id="volume" type="number" step="any"
-                                                                    placeholder="00"
-                                                                    class="form-control @error('volume') is-invalid @enderror"
-                                                                    name="volume"
-                                                                    value="{{ old('volume', $stock->volume) }}" required
-                                                                    autocomplete="volume" autofocus style="float: left;">
-                                                                <select class="form-control form-select" name="measure"
-                                                                    required
-                                                                    style="float: left;max-width:115px; width: inaitial; background-color:rgb(238, 238, 242)">
-                                                                    <option value="Litres"
-                                                                        {{ $stock->measure == 'Litres' ? 'selected' : '' }}>
-                                                                        Litres</option>
-                                                                    <option value="Millilitres"
-                                                                        {{ $stock->measure == 'Millilitres' ? 'selected' : '' }}>
-                                                                        Millilitres</option>
-                                                                </select>
-                                                                @error('volume')
-                                                                    <span class="invalid-feedback" role="alert">
-                                                                        <strong>{{ $message }}</strong>
-                                                                    </span>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-                                                        <div class="text-start mb-1">
-                                                            <label for="quantity"
-                                                                class=" col-form-label text-sm-start">{{ __('Quantity') }}</label>
-                                                            <div class="input-group">
-                                                                <input id="quantity" type="number" step="any"
-                                                                    placeholder="00"
-                                                                    class="form-control @error('quantity') is-invalid @enderror"
-                                                                    name="quantity"
-                                                                    value="{{ old('quantity', $stock->quantity) }}"
-                                                                    required autocomplete="quantity" autofocus
-                                                                    style="float: left;">
-                                                                <select class="form-control form-select" name="unit"
-                                                                    required
-                                                                    style="float: left;max-width:115px; width: inaitial; background-color:rgb(238, 238, 242)">
-                                                                    <option value="Bottles"
-                                                                        {{ $stock->unit == 'Bottles' ? 'selected' : '' }}>
-                                                                        Bottles</option>
-                                                                    <option value="Cartons"
-                                                                        {{ $stock->unit == 'Cartons' ? 'selected' : '' }}>
-                                                                        Cartons</option>
-                                                                </select>
-                                                                @error('quantity')
-                                                                    <span class="invalid-feedback" role="alert">
-                                                                        <strong>{{ $message }}</strong>
-                                                                    </span>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-                                                        <div class="text-start mb-1">
-                                                            <label for="selling_price"
-                                                                class="col-form-label text-sm-start">{{ __('Buying Price') }}</label>
-                                                            <input id="selling_price" type="number" placeholder="Tsh"
-                                                                class="form-control @error('selling_price') is-invalid @enderror"
-                                                                name="selling_price"
-                                                                value="{{ old('selling_price', $stock->selling_price) }}"
-                                                                required autocomplete="selling_price" autofocus>
-                                                            @error('selling_price')
-                                                                <span class="invalid-feedback" role="alert">
-                                                                    <strong>{{ $message }}</strong>
-                                                                </span>
-                                                            @enderror
-                                                        </div>
-                                                        <div class="text-start mb-1">
-                                                            <label for="price"
-                                                                class="col-form-label text-sm-start">{{ __('Selling Price') }}</label>
-                                                            <input id="price" type="number" placeholder="Tsh"
-                                                                class="form-control @error('price') is-invalid @enderror"
-                                                                name="price"
-                                                                value="{{ old('price', $stock->product->selling_price) }}"
-                                                                required autocomplete="price" autofocus>
-                                                            @error('price')
-                                                                <span class="invalid-feedback" role="alert">
-                                                                    <strong>{{ $message }}</strong>
-                                                                </span>
-                                                            @enderror
-                                                        </div>
-                                                        <div class="row mb-1 mt-2">
-                                                            <div class="text-center">
-                                                                <button type="submit" class="btn btn-sm btn-primary">
-                                                                    {{ __('Submit') }}
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </form>
-                                                </div>
+                                </td>
+                                <div class="modal modal-lg fade" id="editModal-{{ $stock->id }}" tabindex="-1"
+                                    aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel">Edit Product in
+                                                    Stock
+                                                </h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                @include('includes.edit_stock')
                                             </div>
                                         </div>
                                     </div>
-                                </td>
+                                </div>
+
 
                             </tr>
                         @endforeach

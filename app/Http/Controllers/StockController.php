@@ -65,7 +65,6 @@ class StockController extends Controller
                 'name' => 'required',
                 'volume' => 'required',
                 'unit' => 'required',
-                'measure' => 'required',
                 'type' => 'required',
                 'buying_price' => 'required',
                 'quantity' => 'required',
@@ -80,7 +79,7 @@ class StockController extends Controller
         $product = new ProductController();
         $product->putProduct($request, $stock->product);
 
-        return back()->with('success', "Stock added successful");
+        return back()->with('success', "Product edited successful");
     }
     public function toggleStatus(Request $request, Stock $stock)
     {

@@ -14,6 +14,7 @@
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 
     {{-- DATA TABLE --}}
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.0/css/responsive.bootstrap5.min.css">
@@ -21,10 +22,8 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.2/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.4/css/buttons.bootstrap5.min.css">
 
-    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
 
     <!-- Scripts -->
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
 
 <body>
@@ -136,104 +135,105 @@
     <script>
         $(document).ready(function() {
             var table = $('#data-tebo1').DataTable({
-                dom: "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>" +
-                    "<'row'<'col-sm-12'tr>>" +
-                    "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+                // dom: "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>" +
+                //     "<'row'<'col-sm-12'tr>>" +
+                //     "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
                 lengthChange: true,
                 columnDefs: [{
                     visible: true,
                     targets: '_all'
                 }, ],
-                buttons: [
-                    // {
-                    //     extend: 'print',
-                    //     exportOptions: {
-                    //         columns: ':visible'
-                    //     },
-                    //     messageTop: 'DATAAAAAAAAAA'
+                // buttons: [
+                //     // {
+                //     //     extend: 'print',
+                //     //     exportOptions: {
+                //     //         columns: ':visible'
+                //     //     },
+                //     //     messageTop: 'DATAAAAAAAAAA'
 
-                    // },
-                    {
-                        extend: 'pdf',
-                        exportOptions: {
-                            columns: ':visible'
-                        },
-                        margin: [20, 20, 20, 20],
-                        padding: [20, 20, 20, 20],
-                        customize: function(doc) {
-                            doc.content[1].table.widths = Array(doc.content[1].table.body[0]
-                                .length + 1).join('*').split('');
-                            doc.content[1].table.widths[0] = 'auto';
-                        }
-                    },
-                    {
-                        extend: 'excel',
-                        exportOptions: {
-                            columns: ':visible'
-                        }
-                    },
-                    // {
-                    //     extend: 'csv',
-                    //     exportOptions: {
-                    //         columns: ':visible'
-                    //     }
-                    // },
-                    'colvis'
-                ]
+                //     // },
+                //     {
+                //         extend: 'pdf',
+                //         exportOptions: {
+                //             columns: ':visible'
+                //         },
+                //         margin: [20, 20, 20, 20],
+                //         padding: [20, 20, 20, 20],
+                //         customize: function(doc) {
+                //             doc.content[1].table.widths = Array(doc.content[1].table.body[0]
+                //                 .length + 1).join('*').split('');
+                //             doc.content[1].table.widths[0] = 'auto';
+                //         }
+                //     },
+                //     {
+                //         extend: 'excel',
+                //         exportOptions: {
+                //             columns: ':visible'
+                //         }
+                //     },
+                //     // {
+                //     //     extend: 'csv',
+                //     //     exportOptions: {
+                //     //         columns: ':visible'
+                //     //     }
+                //     // },
+                //     'colvis'
+                // ]
             });
             table.buttons().container()
                 .appendTo('#data-tebo1_wrapper .col-md-6:eq(0)');
-
         });
     </script>
     <script>
         $(document).ready(function() {
             var table = $('#data-tebo2').DataTable({
-                    dom: "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>" +
-                        "<'row'<'col-sm-12'tr>>" +
-                        "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
-                    lengthChange: true,
-                    columnDefs: [{
-                        visible: true,
-                        targets: '_all'
-                    }, ],
-                    // buttons: [{
-                    //         extend: 'print',
-                    //         exportOptions: {
-                    //             columns: ':visible'
-                    //         },
-                    //         messageTop: 'DATAAAAAAAAAA'
+                // dom: "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>" +
+                //     "<'row'<'col-sm-12'tr>>" +
+                //     "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+                lengthChange: true,
+                columnDefs: [{
+                    visible: true,
+                    targets: '_all'
+                }, ],
+                // buttons: [
+                //     // {
+                //     //         extend: 'print',
+                //     //         exportOptions: {
+                //     //             columns: ':visible'
+                //     //         },
+                //     //         messageTop: 'DATAAAAAAAAAA'
 
-                    //     },
-                    {
-                        extend: 'pdf',
-                        exportOptions: {
-                            columns: ':visible'
-                        },
-                        margin: [20, 20, 20, 20],
-                        padding: [20, 20, 20, 20],
-                        customize: function(doc) {
-                            doc.content[1].table.widths = Array(doc.content[1].table.body[0]
-                                .length + 1).join('*').split('');
-                            doc.content[1].table.widths[0] = 'auto';
-                        }
-                    },
-                    {
-                        extend: 'excel',
-                        exportOptions: {
-                            columns: ':visible'
-                        }
-                    },
-                    // {
-                    //     extend: 'csv',
-                    //     exportOptions: {
-                    //         columns: ':visible'
-                    //     }
-                    // },
-                    'colvis'
-                ]
-            }); table.buttons().container()
-        .appendTo('#data-tebo2_wrapper .col-md-6:eq(0)');
+                //     //     },
+                //     {
+                //         extend: 'pdf',
+                //         exportOptions: {
+                //             columns: ':visible'
+                //         },
+                //         margin: [20, 20, 20, 20],
+                //         padding: [20, 20, 20, 20],
+                //         customize: function(doc) {
+                //             doc.content[1].table.widths = Array(doc.content[1].table.body[0]
+                //                 .length + 1).join('*').split('');
+                //             doc.content[1].table.widths[0] = 'auto';
+                //         }
+                //     },
+                //     {
+                //         extend: 'excel',
+                //         exportOptions: {
+                //             columns: ':visible'
+                //         }
+                //     },
+                //     // {
+                //     //     extend: 'csv',
+                //     //     exportOptions: {
+                //     //         columns: ':visible'
+                //     //     }
+                //     // },
+                //     'colvis'
+                // ]
+            });
+            table.buttons().container()
+                .appendTo('#data-tebo2_wrapper .col-md-6:eq(0)');
 
         });
     </script>

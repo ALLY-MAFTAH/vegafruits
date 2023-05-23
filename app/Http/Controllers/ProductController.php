@@ -77,7 +77,6 @@ class ProductController extends Controller
             $attributes = $request->validate([
                 'volume' => 'required',
                 'unit' => 'required',
-                'measure' => 'required',
                 'selling_price' => 'required',
                 'type' => 'required',
             ]);
@@ -88,11 +87,10 @@ class ProductController extends Controller
 
             $product->update($attributes);
         } catch (QueryException $th) {
-            notify()->error('Product "' . $request->name . '" with volume of "' . $request->quantity . '" already exists.');
-            return back();
+            return ['has_error' => true, 'data' => $th->getMessage()];
         }
-        notify()->success('You have successful edited an product');
-        return redirect()->back();
+
+        return ['has_error' => false, 'data' => $product];
     }
 
     // TOGGLE PRODUCT STATUS

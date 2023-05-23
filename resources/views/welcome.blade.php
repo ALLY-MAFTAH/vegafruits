@@ -10,6 +10,7 @@
 
     <title>{{ 'Place Your Order | ' . config('app.name', 'VegaFruits') }}</title>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/smoothness/jquery-ui.css">
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -19,7 +20,6 @@
     <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
 
     <!-- Scripts -->
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
 
 <body>
@@ -99,7 +99,8 @@
                                 data-product-name="{{ $stock->name }}"
                                 data-product-price="{{ $stock->product->selling_price }}"
                                 data-product-quantity="{{ $stock->product->volume }}"
-                                data-product-volume="{{ $stock->product->volume }}">
+                                data-product-volume="{{ $stock->product->volume }}"
+                                data-product-remainedQuantity="{{ $stock->quantity }}">
                                 <i class="fa fa-shopping-cart fa-lg"></i> Add to Cart
                             </button>
                         </div>
@@ -224,23 +225,24 @@
                     volume: productVolume,
                 },
                 success: function(response) {
-                    console.log("Then ni:");
-                    console.log(response);
-                    var quantity = response.totalQuantity;
-                    var price = response.totalPrice.toFixed(0).replace(
-                        /\B(?=(\d{3})+(?!\d))/g, ",");
-
-                    console.log(price);
-                    console.log(quantity);
-                    $(".cart-quantity").text(quantity);
-                    $(".cart-price").text(price);
-
-                    // Populate the cart items table in the modal
-                    var cartItems = response.cart;
-                    var cartItemsHtml = generateCartTable(cartItems)
-                    $('#cart-items').html(cartItemsHtml);
+                    if (response.success) {
+                        var quantity = response.totalQuantity;
+                        var price = response.totalPrice.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,
+                        ",");
+                        $(".cart-quantity").text(quantity);
+                        $(".cart-price").text(price);
+                        var cartItems = response.cart;
+                        var cartItemsHtml = generateCartTable(cartItems);
+                        $('#cart-items').html(cartItemsHtml);
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log('Error:', error);
                 }
             });
+
         });
 
         $(document).on('click', '.remove-item', function() {
@@ -293,9 +295,11 @@
         $(document).on('click', '.increment', function(e) {
             e.preventDefault();
             var input = $(this).closest('.number-input').find('input');
-            var value = parseInt(input.val());
-            var max = parseInt(input.attr('max'));
-            if (!isNaN(max) && value >= max) {
+            var value = parseFloat(input.val());
+            var max = parseFloat(input.attr('max'));
+            console.log(value);
+            console.log(max);
+            if (isNaN(max) && value >= max) {
                 return;
             }
             input.trigger('change');
@@ -304,9 +308,11 @@
         $(document).on('click', '.decrement', function(e) {
             e.preventDefault();
             var input = $(this).closest('.number-input').find('input');
-            var value = parseInt(input.val());
-            var min = parseInt(input.attr('min'));
-            if (!isNaN(min) && value <= min) {
+            var value = parseFloat(input.val());
+            var min = parseFloat(input.attr('min'));
+            console.log(value);
+            console.log(min);
+            if (isNaN(min) && value <= min) {
                 return;
             }
             input.trigger('change');
@@ -317,17 +323,19 @@
 
             var input = $(this);
             var productId = input.data('product-id');
-            var newQuantity = input.val();
-            var minQuantity = input.attr('min');
+            var newQuantity = parseFloat(input.val());
+            var minQuantity = parseFloat(input.attr('min'));
+            var maxQuantity = parseFloat(input.attr('max'));
 
-            if (parseInt(newQuantity) < parseInt(minQuantity)) {
+            if (parseFloat(newQuantity) < parseFloat(minQuantity)) {
                 alert('The minimum quantity is ' + minQuantity);
                 newQuantity = minQuantity;
                 input.val(newQuantity);
             }
-            if (parseInt(newQuantity) < parseInt(minQuantity)) {
-                alert('The minimum quantity is ' + minQuantity);
-                newQuantity = minQuantity;
+
+            if (parseFloat(newQuantity) > parseFloat(maxQuantity)) {
+                alert('Sorry, the remained quantity in stock is ' + maxQuantity);
+                newQuantity = maxQuantity;
                 input.val(newQuantity);
             }
 
@@ -348,6 +356,7 @@
                     $('.cart-quantity').text(quantity);
                     $('.cart-price').text(price);
                     var cartItems = response.cart;
+
                     var cartTableHtml = generateCartTable(cartItems);
                     $('#cart-items').html(cartTableHtml);
                 },
@@ -378,11 +387,7 @@
             cartTableHtml += '<tbody>';
 
             for (var cartItem in cartItems) {
-                if (cartItems[cartItem].quantity > cartItems[cartItem].remainedQuantity) {
-                    alert('Sorry, only '+cartItems[cartItem].remainedQuantity+' '+cartItems[cartItem].unit' of '+cartItems[cartItem].name.' has remained.')
-                } else {
 
-                }
                 var total = (cartItems[cartItem].price * cartItems[cartItem].quantity) / cartItems[cartItem].volume;
                 cartTableHtml += '<tr>';
                 cartTableHtml += '<td>' + cartItems[cartItem].name + '</td>';
@@ -390,17 +395,22 @@
                     '</td>';
                 cartTableHtml += '<td><div class="number-input">';
                 cartTableHtml +=
-                    '<input id="quantity-input" type="number" class="form-control update-cart-quantity" min="' + cartItems[
-                        cartItem].volume + '" value="' + cartItems[cartItem].quantity + '" data-product-id="' + cartItem +
+                    '<input id="quantity-input" type="number" class="form-control update-cart-quantity" min="' +
+                    cartItems[
+                        cartItem].volume + '" max="' + cartItems[cartItem].remainedQuantity + '" value="' + cartItems[
+                        cartItem].quantity + '" data-product-id="' +
+                    cartItem +
                     '">';
                 cartTableHtml += '<div class="spinners">';
                 cartTableHtml += '<button class="spinner increment">&#9650;</button>';
                 cartTableHtml += '<button class="spinner decrement">&#9660;</button>';
                 cartTableHtml += '</div></div></td>';
-                cartTableHtml += '<td class="text-end">' + total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</td>';
+                cartTableHtml += '<td class="text-end">' + total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",") +
+                    '</td>';
                 cartTableHtml += '<td><a type="button" class="btn-danger remove-item" data-product-id="' + cartItem +
                     '"><i class="fa fa-trash " style="color:red"></i></a></td>';
                 cartTableHtml += '</tr>';
+
             }
 
             cartTableHtml += '</tbody></table>';
@@ -410,15 +420,18 @@
             // Attach event listeners to increment and decrement buttons
             var incrementButtons = cartTable.find('.increment');
             var decrementButtons = cartTable.find('.decrement');
+
             incrementButtons.on('click', function() {
                 var input = $(this).closest('.number-input').find('.update-cart-quantity');
-                var currentValue = parseInt(input.val());
-                input.val(currentValue + 1);
+                var currentValue = parseFloat(input.val());
+                if (currentValue <= parseFloat(input.attr('max'))) {
+                    input.val(currentValue + 1);
+                }
             });
             decrementButtons.on('click', function() {
                 var input = $(this).closest('.number-input').find('.update-cart-quantity');
-                var currentValue = parseInt(input.val());
-                if (currentValue > parseInt(input.attr('min'))) {
+                var currentValue = parseFloat(input.val());
+                if (currentValue >= parseFloat(input.attr('min'))) {
                     input.val(currentValue - 1);
                 }
             });

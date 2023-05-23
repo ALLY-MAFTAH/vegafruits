@@ -25,19 +25,26 @@ class CartController extends Controller
 
     public function addToCart(Request $request)
     {
-
         $productId = $request->input('product_id');
         $productName = $request->input('product_name');
         $productPrice = floatval($request->input('product_price'));
-        $quantity = floatval($request->input('quantity'));
-        $volume = floatval($request->input('volume'));
+        $quantity = intval($request->input('quantity'));
+        $volume = intval($request->input('volume'));
 
         $stock = Stock::find($productId);
-        $remainedQuantity = $stock->quantity;
+        $remainedQuantity = intval($stock->quantity);
         $unit = $stock->unit;
         $cart = session()->get('cart', []);
 
+        // Check if the cart quantity exceeds the remained quantity in stock
         if (isset($cart[$productId])) {
+            $newQuantity = $cart[$productId]['quantity'] + $quantity;
+            if ($newQuantity > $remainedQuantity) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'The remained quantity in stock is ' . $remainedQuantity,
+                ]);
+            }
             $cart[$productId]['quantity'] += $quantity;
             session()->put('cart', $cart);
         } else {
@@ -54,7 +61,7 @@ class CartController extends Controller
 
         $cartAmount = 0;
         foreach ($cart as $cartItem) {
-            $cartAmount = $cartAmount + (($cartItem['quantity'] / $cartItem['volume']) * $cartItem['price']);
+            $cartAmount += ($cartItem['quantity'] / $cartItem['volume']) * $cartItem['price'];
         }
 
         return response()->json([
@@ -65,10 +72,11 @@ class CartController extends Controller
         ]);
     }
 
+
     public function updateCart(Request $request)
     {
-        $productId = $request->input('product_id');
-        $quantity = $request->input('quantity');
+        $productId = intval($request->input('product_id'));
+        $quantity = floatval($request->input('quantity'));
 
         $cart = session()->get('cart', []);
 
