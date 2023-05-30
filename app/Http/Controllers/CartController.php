@@ -49,6 +49,7 @@ class CartController extends Controller
             session()->put('cart', $cart);
         } else {
             $cart[$productId] = [
+                'id' => $productId,
                 'name' => $productName,
                 'price' => $productPrice,
                 'quantity' => $quantity,

@@ -15,10 +15,13 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->date('date');
             $table->string('number');
+            $table->string('deliver_location');
             $table->date('served_date')->nullable();
+            $table->string('served_by')->nullable();
             $table->boolean('status')->default(false);
-            $table->integer('customer_id');
+            $table->bigInteger('customer_id');
             $table->timestamps();
             $table->softDeletes();
         });

@@ -10,12 +10,13 @@ class Order extends Model
 {
     use HasFactory, SoftDeletes;
     protected $fillable = [
+        'date',
         'number',
         'served_date',
         'status',
-        'created_by',
-        'user_id',
-
+        'served_by',
+        'customer_id',
+        'deliver_location',
     ];
 
     protected $dates = [
@@ -26,8 +27,8 @@ class Order extends Model
     {
         return  $this->hasMany(Item::class);
     }
-    public function user()
+    public function customer()
     {
-        return  $this->belongsTo(User::class, 'user_id');
+        return  $this->belongsTo(Customer::class, 'customer_id');
     }
 }

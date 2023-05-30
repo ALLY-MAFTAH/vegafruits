@@ -6,17 +6,9 @@ use Illuminate\Support\Facades\Http;
 
 class MessagingService
 {
-    /**
-     * Send SMS through Next SMS API
-     *
-     * @param object $receiver
-     * @param string $body
-     *
-     * @return \Illuminate\Http\Client\Response|null
-     */
+
     public function sendMessage($mobile, $body)
     {
-
         $from = 'NEXTSMS';
         $text = $body;
         $to = substr_replace($mobile, "255", 0, 1);

@@ -2,18 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
 use Illuminate\Routing\Controller;
 
 use App\Models\Item;
+use App\Models\Message;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\Stock;
 use App\Models\User;
+use App\Services\MessagingService;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
@@ -113,6 +118,135 @@ class OrderController extends Controller
         return response()->json($selectedStocks);
     }
 
+    public function customerInfo(Request $request)
+    {
+        try {
+            $attributes = $request->validate([
+                'name' => 'required',
+                'mobile' => 'required',
+                'deliver_location' => 'required',
+                // 'delivery_date' => 'required',
+                // 'delivery_time' => 'required',
+            ]);
+
+            session(['name' => $request->name]);
+            session(['mobile' => $request->mobile]);
+            session(['delivery_date' => $request->delivery_date]);
+            session(['delivery_time' => $request->delivery_time]);
+            session(['deliver_location' => $request->deliver_location]);
+
+            $otp = mt_rand(1000, 9999);
+            session(['otp' => $otp]);
+
+            $messageBody = "Your Vega Fruits Verification Code is: " . $otp;
+
+            $messagingService = new MessagingService();
+            $sendMessageResponse = $messagingService->sendMessage($request->mobile, $messageBody);
+            // $sendMessageResponse = "Sent";
+            $lastFourDigits = substr($request->mobile, -4);
+
+            if ($sendMessageResponse == "Sent") {
+                session(['verifyOTPDialog' => true]);
+                session(['lastFourDigits' => $lastFourDigits]);
+
+                return back();
+            } else {
+                return back()->with('error', 'OTP not sent, crosscheck your inputs');
+            }
+        } catch (\Throwable $th) {
+            dd($th->getMessage());
+            return back()->with('error', $th->getMessage());
+        }
+    }
+    public function verifyOTP(Request $request)
+    {
+        if (!session('otp')) {
+
+            $homeController = new HomeController();
+            $homeResponse = $homeController->welcome();
+            return $homeResponse;
+        } else {
+
+
+            $otp = $request->first . $request->second . $request->third . $request->fourth;
+
+            try {
+
+                $storedOtp = session('otp');
+
+                if (intval($otp) == $storedOtp) {
+                    session()->forget('otp');
+                    session()->forget('verifyOTPDialog');
+                    $orderResponse = self::createOrder();
+
+                    if ($orderResponse['status'] == "Sent") {
+                        return view('payments')->with('success', 'Order created successful');
+                    } else {
+                        return back()->with('error', $orderResponse['data']);
+                    }
+                } else {
+                    // session()->forget('otp');
+                    // session()->forget('verifyOTPDialog');
+                    return back()->with('error', 'OTP Verification failed, please try again');
+                }
+            } catch (\Throwable $th) {
+                return back()->with('error', $th->getMessage());
+            }
+        }
+    }
+    public function createOrder()
+    {
+        $carts = session()->get('cart');
+
+        try {
+            $customerAttr = [
+                "name" => session()->get('name'),
+                "mobile" => session()->get('mobile'),
+                "delivery_date" => session()->get('delivery_date'),
+                "delivery_time" => session()->get('delivery_time'),
+
+            ];
+            $customer = Customer::create($customerAttr);
+
+            $orderAttr = [
+                "number" => 1,
+                "deliver_location" => session()->get('deliver_location'),
+                'date' => Carbon::now('GMT+3')->toDateString(),
+                'customer_id' => $customer->id
+            ];
+            $order = Order::create($orderAttr);
+
+            foreach ($carts as $cart) {
+                $product = Product::find($cart['id']);
+                $quantity = $cart['quantity'];
+
+                $attributes = [
+                    'name' => $product->name,
+                    'type' => $product->type,
+                    'volume' => $product->volume,
+                    'price' => $cart['price'] * ($quantity / $product->volume),
+                    'quantity' => $quantity,
+                    'unit' => $product->unit,
+                    'product_id' => $product->id,
+                    'customer_id' => $customer->id,
+                    'order_id' => $order->id,
+                    'stock_id' => $product->stock_id,
+                ];
+                $item = Item::create($attributes);
+                $order->items()->save($item);
+            }
+            session()->forget('cart');
+            session(['paymentModal' => true]);
+
+            return ['status' => true, 'data' => $order];
+        } catch (\Throwable $th) {
+            return ['status' => false, 'data' => $th->getMessage()];
+        }
+    }
+    public function payments(Request $request, Order $order)
+    {
+        return view('payments')->with('success', "Order created successful");
+    }
     public function putOrder(Request $request, Order $order)
     {
 

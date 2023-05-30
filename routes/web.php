@@ -25,6 +25,8 @@ Route::post('/cart/update', [CartController::class, 'updateCart'])->name('cart.u
 Route::post('/cart/checkout', [CartController::class, 'cartCheckout'])->name('cart.checkout');
 Route::post('/cart/remove', [CartController::class, 'removeFromCart'])->name('cart.remove');
 Route::post('/cart/empty', [CartController::class, 'emptyCart'])->name('cart.empty');
+Route::post('/add-customer_info', [OrderController::class, 'customerInfo'])->name('orders.customer_info');
+Route::post('/verify-OTP', [OrderController::class, 'verifyOTP'])->name('orders.verify_OTP');
 
 
 Auth::routes();
@@ -69,4 +71,5 @@ Route::middleware(['auth'])->group(function () {
 
     // SALES ROUTES
     Route::get('/sales', [SaleController::class, 'allSales'])->name('sales.index');
+    Route::get('/payments', [OrderController::class, 'payments'])->name('payments');
 });

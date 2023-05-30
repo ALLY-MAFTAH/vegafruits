@@ -10,12 +10,15 @@ class Item extends Model
 {
     use HasFactory, SoftDeletes;
     protected $fillable = [
-        'stock_id',
         'name',
-        'quantity',
-        'volume',
         'unit',
-        'order_id'
+        'type',
+        'price',
+        'volume',
+        'stock_id',
+        'quantity',
+        'order_id',
+        'product_id',
 
     ];
 
@@ -25,6 +28,18 @@ class Item extends Model
 
     public function order()
     {
-        return  $this->belongsTo(Order::class,'order_id');
+        return  $this->belongsTo(Order::class, 'order_id');
+    }
+    public function customer()
+    {
+        return  $this->belongsTo(Customer::class, 'customer_id');
+    }
+    public function product()
+    {
+        return  $this->belongsTo(Product::class, 'product_id');
+    }
+    public function stock()
+    {
+        return  $this->belongsTo(Stock::class, 'stock_id');
     }
 }

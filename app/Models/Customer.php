@@ -11,8 +11,7 @@ class Customer extends Model
     use HasFactory, SoftDeletes;
     protected $fillable = [
         'name',
-        'phone',
-        'status',
+        'mobile',
 
     ];
 
@@ -23,5 +22,9 @@ class Customer extends Model
     public function goods()
     {
         return  $this->hasMany(Good::class);
+    }
+    public function messages()
+    {
+        return  $this->hasMany(Message::class);
     }
 }
