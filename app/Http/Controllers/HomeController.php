@@ -19,8 +19,6 @@ class HomeController extends Controller
     }
     public function welcome()
     {
-        // $sendMessageResponse = "Seont";
-        // $lastFourDigits = "0000";
         $stocks = Stock::where('status', true)->get();
         $products = Product::where('status', true)->get();
         return view('welcome', compact('stocks', 'products'));

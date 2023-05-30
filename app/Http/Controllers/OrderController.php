@@ -162,11 +162,8 @@ class OrderController extends Controller
     {
         if (!session('otp')) {
 
-            $homeController = new HomeController();
-            $homeResponse = $homeController->welcome();
-            return $homeResponse;
+            return Redirect::route('/')->with('success', 'Order created successfully');
         } else {
-
 
             $otp = $request->first . $request->second . $request->third . $request->fourth;
 
@@ -180,13 +177,11 @@ class OrderController extends Controller
                     $orderResponse = self::createOrder();
 
                     if ($orderResponse['status'] == "Sent") {
-                        return view('payments')->with('success', 'Order created successful');
+                        return Redirect::route('payments')->with('success', 'Order created successfully');
                     } else {
                         return back()->with('error', $orderResponse['data']);
                     }
                 } else {
-                    // session()->forget('otp');
-                    // session()->forget('verifyOTPDialog');
                     return back()->with('error', 'OTP Verification failed, please try again');
                 }
             } catch (\Throwable $th) {

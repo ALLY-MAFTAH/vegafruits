@@ -289,7 +289,6 @@
     </div>
     {{-- VERIFY OTP DIALOG --}}
 
-    {{-- <div id="otp-dialog-container" data-send-message-response="{{ $sendMessageResponse }}"> --}}
     <div id="otp-dialog-container">
         <div id="otp-dialog" title="Please Enter Verification Code">
             <div class="pt-4">
