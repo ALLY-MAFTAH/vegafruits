@@ -18,8 +18,8 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::get('/', [HomeController::class, 'welcome'])->name('welcome');
-Route::get('/cart/get-cart', [CartController::class, 'getCart']);
 
+Route::get('/cart/get-cart', [CartController::class, 'getCart']);
 Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
 Route::post('/cart/update', [CartController::class, 'updateCart'])->name('cart.update');
 Route::post('/cart/checkout', [CartController::class, 'cartCheckout'])->name('cart.checkout');
@@ -27,11 +27,9 @@ Route::post('/cart/remove', [CartController::class, 'removeFromCart'])->name('ca
 Route::post('/cart/empty', [CartController::class, 'emptyCart'])->name('cart.empty');
 Route::post('/add-customer_info', [OrderController::class, 'customerInfo'])->name('orders.customer_info');
 Route::post('/verify-OTP', [OrderController::class, 'verifyOTP'])->name('orders.verify_OTP');
-Route::get('/payments', [OrderController::class, 'payments'])->name('payments');
-
+Route::get('/payments/{order}', [OrderController::class, 'payments'])->name('payments');
 
 Auth::routes();
-
 
 Route::middleware(['auth'])->group(function () {
 

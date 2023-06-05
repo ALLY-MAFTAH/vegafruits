@@ -13,8 +13,6 @@
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 
     {{-- DATA TABLE --}}
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.0/css/responsive.bootstrap5.min.css">
@@ -22,13 +20,15 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.2/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.4/css/buttons.bootstrap5.min.css">
 
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     <!-- Scripts -->
 </head>
 
 <body>
     <div id="app">
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+        <nav class="px-3 navbar navbar-expand-md navbar-light bg-white shadow-sm">
                 <a class="" href="{{ url('/') }}">
                     <img src="{{ asset('assets/images/logo.png') }}" height="40px" alt="">
                 </a>
@@ -96,7 +96,7 @@
         </nav>
 
         <main class="py-4">
-            <div class="container">
+            <div class="px-3">
 
                 @yield('content')
             </div>

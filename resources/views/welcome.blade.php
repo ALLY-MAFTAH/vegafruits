@@ -370,14 +370,14 @@
                             </div>
                         </div>
                         <div class="col form-group mb-1">
-                            <label for="deliver_location"
+                            <label for="delivery_location"
                                 class=" col-form-label text-sm-start">{{ __('Delivery Location') }}</label>
                             <div class="">
-                                <input id="deliver_location" type="text" placeholder="Delivery Location" required
-                                    class="form-control @error('deliver_location') is-invalid @enderror"
-                                    name="deliver_location" value="{{ old('deliver_location') }}"
+                                <input id="delivery_location" type="text" placeholder="Delivery Location" required
+                                    class="form-control @error('delivery_location') is-invalid @enderror"
+                                    name="delivery_location" value="{{ old('delivery_location') }}"
                                     autocomplete="address" autofocus>
-                                @error('deliver_location')
+                                @error('delivery_location')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
@@ -389,13 +389,13 @@
                                 <div class="col-6">
                                     <label for="delivery_date"
                                         class=" col-form-label text-sm-start">{{ __('Delivery Date') }}</label>
-                                    <input type="date" id="delivery_date" name="delivery_date"
+                                    <input type="date" id="delivery_date" name="delivery_date" required
                                         class="form-control">
                                 </div>
                                 <div class="col-6">
                                     <label for="delivery_time"
                                         class=" col-form-label text-sm-start">{{ __('Delivery Time') }}</label>
-                                    <input type="time" id="delivery_time" name="delivery_time"
+                                    <input type="time" id="delivery_time" name="delivery_time" required
                                         class="form-control">
                                 </div>
                             </div>

@@ -36,7 +36,6 @@ class OrderController extends Controller
 
     public function showOrder(Request $request, Order $order)
     {
-
         return view('orders.show', compact('order'));
     }
 
@@ -124,16 +123,16 @@ class OrderController extends Controller
             $attributes = $request->validate([
                 'name' => 'required',
                 'mobile' => 'required',
-                'deliver_location' => 'required',
-                // 'delivery_date' => 'required',
-                // 'delivery_time' => 'required',
+                'delivery_location' => 'required',
+                'delivery_date' => 'required',
+                'delivery_time' => 'required',
             ]);
 
             session(['name' => $request->name]);
             session(['mobile' => $request->mobile]);
             session(['delivery_date' => $request->delivery_date]);
             session(['delivery_time' => $request->delivery_time]);
-            session(['deliver_location' => $request->deliver_location]);
+            session(['delivery_location' => $request->delivery_location]);
 
             $otp = mt_rand(1000, 9999);
             session(['otp' => $otp]);
@@ -162,7 +161,8 @@ class OrderController extends Controller
     {
         if (!session('otp')) {
 
-            return Redirect::route('/')->with('success', 'Order created successfully');
+            return Redirect::route('welcome');
+
         } else {
 
             $otp = $request->first . $request->second . $request->third . $request->fourth;
@@ -177,7 +177,8 @@ class OrderController extends Controller
                     $orderResponse = self::createOrder();
 
                     if ($orderResponse['status'] == "Sent") {
-                        return Redirect::route('payments')->with('success', 'Order created successfully');
+                        $order = $orderResponse['data'];
+                        return Redirect::route('payments', $order)->with(['success' => 'Order created successfully']);
                     } else {
                         return back()->with('error', $orderResponse['data']);
                     }
@@ -201,11 +202,15 @@ class OrderController extends Controller
             ];
             $customer = Customer::create($customerAttr);
 
+            $lastOrderRow = Order::latest('created_at')->latest('id')->first();
+            $lastOrderNumber = $lastOrderRow ? $lastOrderRow->number : "VFO/00000";
+            $newOrderNumber = ++$lastOrderNumber;
+
             $orderAttr = [
-                "number" => 1,
+                "number" => $newOrderNumber,
                 "delivery_date" => session()->get('delivery_date'),
                 "delivery_time" => session()->get('delivery_time'),
-                "deliver_location" => session()->get('deliver_location'),
+                "delivery_location" => session()->get('delivery_location'),
                 'date' => Carbon::now('GMT+3')->toDateString(),
                 'customer_id' => $customer->id
             ];
@@ -230,6 +235,12 @@ class OrderController extends Controller
                 $item = Item::create($attributes);
                 $order->items()->save($item);
             }
+            $totalAmount = 0;
+            foreach ($order->items as $item) {
+                $totalAmount = $totalAmount + $item->price;
+            }
+
+            $order->update(['total_amount' => $totalAmount]);
             session()->forget('cart');
             session(['paymentModal' => true]);
 
@@ -238,66 +249,65 @@ class OrderController extends Controller
             return ['status' => false, 'data' => $th->getMessage()];
         }
     }
-    public function payments(Request $request, Order $order)
-    {
-        return view('payments')->with('success', "Order created successful");
-    }
-    public function putOrder(Request $request, Order $order)
-    {
 
-        try {
-            $attributes = $request->validate([
-                'volume' => 'required',
-                'unit' => 'required',
-                'measure' => 'required',
-                'price' => 'required',
-            ]);
+    // public function putOrder(Request $request, Order $order)
+    // {
 
-            $order->update($attributes);
-        } catch (QueryException $th) {
-            notify()->error('Order "' . $request->name . '" with volume of "' . $request->quantity . '" already exists.');
-            return back();
-        }
-        notify()->success('You have successful edited an order');
-        return redirect()->back();
-    }
+    //     try {
+    //         $attributes = $request->validate([
+    //             'volume' => 'required',
+    //             'unit' => 'required',
+    //             'measure' => 'required',
+    //             'price' => 'required',
+    //         ]);
 
-    public function toggleStatus(Request $request, Order $order)
-    {
-        try {
+    //         $order->update($attributes);
+    //     } catch (QueryException $th) {
+    //         notify()->error('Order "' . $request->name . '" with volume of "' . $request->quantity . '" already exists.');
+    //         return back();
+    //     }
+    //     notify()->success('You have successful edited an order');
+    //     return redirect()->back();
+    // }
 
-            $attributes = $request->validate([
-                'status' => ['required', 'boolean'],
-            ]);
-            $attributes['served_date'] =  Carbon::now();
+    // public function toggleStatus(Request $request, Order $order)
+    // {
+    //     try {
 
-            $order->update($attributes);
+    //         $attributes = $request->validate([
+    //             'status' => ['required', 'boolean'],
+    //         ]);
+    //         $attributes['served_date'] =  Carbon::now();
 
-            $items = Item::where(['order_id' => $order->id])->get();
-            foreach ($items as $item) {
-                $stock = Stock::findOrFail($item->stock_id);
+    //         $order->update($attributes);
 
-                $newQuantity = $stock->quantity + $item->quantity;
-                $attributes = [
-                    'quantity' => $newQuantity
-                ];
-                $stock->update($attributes);
-            }
-        } catch (QueryException $th) {
-            notify()->error($th->getMessage());
-            return back();
-        }
-        notify()->success('You have successfully updated order status');
-        return back();
-    }
+    //         $items = Item::where(['order_id' => $order->id])->get();
+    //         foreach ($items as $item) {
+    //             $stock = Stock::findOrFail($item->stock_id);
+
+    //             $newQuantity = $stock->quantity + $item->quantity;
+    //             $attributes = [
+    //                 'quantity' => $newQuantity
+    //             ];
+    //             $stock->update($attributes);
+    //         }
+    //     } catch (QueryException $th) {
+    //         notify()->error($th->getMessage());
+    //         return back();
+    //     }
+    //     notify()->success('You have successfully updated order status');
+    //     return back();
+    // }
 
     public function deleteOrder(Order $order)
     {
 
-        $itsName = $order->name;
         $order->delete();
 
-        notify()->success('You have successful deleted ' . $itsName . '.');
-        return back();
+        return back()->with('success', 'Order deleted successful');
+    }
+    public function payments(Request $request, Order $order)
+    {
+        return view('payments', compact('order'))->with('success', "Order created successful");
     }
 }

@@ -68,44 +68,60 @@
                 </div>
             @endif
             <div class="text-center">
-                <div class="card mb-4 mt-1">
-                    <div class="card-body py-1">
-                        <div class="row">
-                            <div class="col-4">
-                                <img src="{{ asset('assets/images/success.png') }}" width="110px" height="100px"
-                                    alt="">
-                            </div>
-                            <div class="col-8 text-start text-success" style="font-size:16px">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-4 mt-1 shadow" style="background-color: rgba(176, 220, 182, 0.24)">
+                            <div class="card-body py-1">
+                                <div class="row">
+                                    <div class="col-4 d-flex align-items-center justify-content-center">
+                                        <img src="{{ asset('assets/images/success.png') }}" width="110px"
+                                            height="100px" alt="">
+                                    </div>
+                                    <div class="col-8 text-start text-success" style="font-size:16px">
 
-                                <div>
-                                    Order Number: <b>0034</b>
-                                </div>
-                                <div>
-                                    Created Date: <b>June,09 2023</b>
-                                </div>
-                                <div>
-                                    Delivery Date: <b>June,09 2023</b>
-                                </div>
-                                <div>
-                                    Location: <b>Manzese Darajani</b>
-                                </div>
-                                <div>
-                                    Customer: <b>ally Maftah</b>
-                                </div>
-                                <div>
-                                    Phone: <b>0714871033</b>
+                                        <div>
+                                            Order Number: <b>{{ $order->number }}</b>
+                                        </div>
+                                        <div>
+                                            Created Date:
+                                            <b>{{ Illuminate\Support\Carbon::parse($order->date)->format('D, d M, Y') }}
+                                            </b>
+                                        </div>
+                                        <div>
+                                            Delivery Date:
+                                            <b>{{ Illuminate\Support\Carbon::parse($order->delivery_date)->format('D, d M, Y') }}
+                                            </b>
+                                        </div>
+                                        <div>
+                                            Delivery Time:
+                                            <b>{{ $order->delivery_time }} </b>
+                                        </div>
+                                        <div>
+                                            Location: <b>{{ $order->delivery_location }}</b>
+                                        </div>
+                                        <div>
+                                            Customer: <b>{{ $order->customer->name }}</b>
+                                        </div>
+                                        <div>
+                                            Phone: <b>{{ $order->customer->mobile }}</b>
+                                        </div>
+                                        <div>
+                                            Amount: <b>{{ number_format($order->total_amount, 0, '.', ',') }} Tsh</b>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="text-center">
-                    <h5 class="text-info">Please make sure you pay for your order within 5 hours from now.</h5>
-                    <p class="text-grey">Payment Method</p>
-                    <img class="shadow" src="{{ asset('assets/images/LIPA NAMBA.jpg') }}" width="350px" height="100%"
-                        alt="">
-                    <br>
-                    <br>
+                    <div class="col-md-6 text-center">
+                        <h5 style="color:rgb(135, 10, 10);font-weight:bold">Please make sure you pay for your order within next 1
+                            hour. Our staff will contact you soon after completing payment.</h5>
+                        <p class="text-grey">Payment Method</p>
+                        <img class="shadow" src="{{ asset('assets/images/LIPA NAMBA.jpg') }}" width="480px"
+                            height="100%" alt="">
+                        <br>
+                        <br>
+                    </div>
                 </div>
                 <br>
                 <br>

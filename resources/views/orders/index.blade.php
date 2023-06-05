@@ -177,13 +177,14 @@
                 <hr>
             </div>
             <table id="data-tebo1"
-                class="dt-responsive nowrap table shadow rounded-3 table-responsive-sm  table-striped table-hover"
+                class="dt-responsive nowrap table table-bordered shadow rounded-3 table-responsive-sm  table-striped table-hover"
                 style="width: 100%">
                 <thead class="shadow rounded-3">
                     <th style="max-width: 20px">#</th>
                     <th>Order Number</th>
                     <th>Created Date</th>
                     <th>Order Items</th>
+                    <th>Amount</th>
                     <th>Delivery Location</th>
                     <th>Delivery Date</th>
                     <th>Delivery Time</th>
@@ -203,17 +204,18 @@
                         <tr>
                             <td>{{ ++$index }}</td>
                             <td>{{ $order->number }}</td>
-                            <td>{{ Illuminate\Support\Carbon::parse($order->created_at)->format('d M Y') }}</td>
+                            <td>{{ Illuminate\Support\Carbon::parse($order->date)->format('D, d M, Y') }}</td>
                             <td>
                                 @foreach ($order->items as $item)
                                     <div>
-                                        {{ $item->name }}  {{ $item->measure }} -
+                                        {{ $item->name }} -
                                         {{ $item->quantity }} {{ $item->unit }},
                                     </div>
                                 @endforeach
                             </td>
-                            <td>{{ $order->deliver_location }}</td>
-                            <td>{{ $order->delivery_date }}</td>
+                            <td>{{number_format($order->total_amount,0,'.',',') }} Tsh</td>
+                            <td>{{ $order->delivery_location }}</td>
+                            <td>{{ Illuminate\Support\Carbon::parse($order->delivery_date)->format('D, d M, Y') }}</td>
                             <td>{{ $order->delivery_time }}</td>
                             <td>{{ $order->customer->name }}</td>
                             <td>{{ $order->customer->mobile }}</td>

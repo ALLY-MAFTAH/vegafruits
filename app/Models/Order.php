@@ -12,13 +12,14 @@ class Order extends Model
     protected $fillable = [
         'date',
         'number',
-        'served_date',
         'status',
         'served_by',
+        'served_date',
         'customer_id',
-        'deliver_date',
+        'total_amount',
+        'delivery_date',
         'delivery_time',
-        'deliver_location',
+        'delivery_location',
     ];
 
     protected $dates = [

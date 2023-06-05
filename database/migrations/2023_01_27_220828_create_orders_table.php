@@ -19,7 +19,8 @@ return new class extends Migration
             $table->string('delivery_time');
             $table->date('delivery_date');
             $table->string('number');
-            $table->string('deliver_location');
+            $table->double('total_amount')->nullable();
+            $table->string('delivery_location');
             $table->date('served_date')->nullable();
             $table->string('served_by')->nullable();
             $table->boolean('status')->default(false);
