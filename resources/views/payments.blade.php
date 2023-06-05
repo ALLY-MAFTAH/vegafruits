@@ -48,8 +48,6 @@
                     aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-
-               
             </div>
         </nav>
 
@@ -69,7 +67,49 @@
                     {{ session('error') }}
                 </div>
             @endif
+            <div class="text-center">
+                <div class="card mb-4 mt-1">
+                    <div class="card-body py-1">
+                        <div class="row">
+                            <div class="col-4">
+                                <img src="{{ asset('assets/images/success.png') }}" width="110px" height="100px"
+                                    alt="">
+                            </div>
+                            <div class="col-8 text-start text-success" style="font-size:16px">
 
+                                <div>
+                                    Order Number: <b>0034</b>
+                                </div>
+                                <div>
+                                    Created Date: <b>June,09 2023</b>
+                                </div>
+                                <div>
+                                    Delivery Date: <b>June,09 2023</b>
+                                </div>
+                                <div>
+                                    Location: <b>Manzese Darajani</b>
+                                </div>
+                                <div>
+                                    Customer: <b>ally Maftah</b>
+                                </div>
+                                <div>
+                                    Phone: <b>0714871033</b>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <h5 class="text-info">Please make sure you pay for your order within 5 hours from now.</h5>
+                    <p class="text-grey">Payment Method</p>
+                    <img class="shadow" src="{{ asset('assets/images/LIPA NAMBA.jpg') }}" width="350px" height="100%"
+                        alt="">
+                    <br>
+                    <br>
+                </div>
+                <br>
+                <br>
+                <br>
         </main>
         <footer>
             <div class="row pt-2 text-center">
@@ -77,15 +117,12 @@
                     <button id="contact-open-dialog" class="btn btn-light">Contacts</button>
                 </div>
                 <div class="col text-center">
-                    <button data-bs-toggle="modal" id="cart-modal" data-bs-target="#cartModal"
-                        style="position: relative; width: 150px;" class="btn btn-warning">
+                    <a href="{{ route('welcome') }}" style="position: relative; width: 150px;" class="btn btn-warning">
                         <div>
                             <i class="fa fa-shopping-cart fa-lg"></i>
-                            <span class="cart-quantity"
-                                style="position: absolute; top: -10px; left: -10px; background-color: red; color: white; border-radius: 50%; padding: 2px 10px;">0</span>
-                            <b class="cart-price text-white">0</b> Tsh
+                            <b class=""> New Order</b>
                         </div>
-                    </button>
+                    </a>
                 </div>
                 <div class="col text-center">
                     <button id="about-open-dialog" class="btn btn-light">About Us</button>
@@ -93,7 +130,82 @@
             </div>
         </footer>
     </div>
+    {{-- CONTACTS DIALOG --}}
+    <div id="contact-dialog-container">
+        <div id="contact-dialog" title="Contact Us">
+            <div class="text-center text-success py-1">
+                Keep in touch with us through our quick links
+            </div>
+            <hr>
+            <div class="px-5">
+                <a href="tel:+255714871033" style="text-decoration: none; color:rgb(64, 8, 72);font-weight:bold">
+                    <div class="row" style="font-size: 20px">
+                        <div class="col-2">
+                            <i style="font-size: 30px" class="fa fa-phone"></i>
+                        </div>
+                        <div class="col-10">+255714871033</div>
+                    </div>
+                </a>
+                <hr>
+                <a href="https://api.whatsapp.com/send?phone=255714871033"
+                    style="text-decoration: none; color:green;font-weight:bold">
+                    <div class="row" style="font-size: 20px">
+                        <div class="col-2">
+                            <i style="font-size: 30px;" class="fa fa-whatsapp"></i>
+                        </div>
+                        <div class="col-10">+255714871033</div>
+                    </div>
+                </a>
+                <hr>
+                <a href="https://www.instagram.com/"
+                    style="text-decoration: none; color:rgb(193, 11, 193);font-weight:bold">
+                    <div class="row" style="font-size: 20px">
+                        <div class="col-2">
+                            <i style="font-size: 30px;" class="fa fa-instagram"></i>
+                        </div>
+                        <div class="col-10">vegafruits</div>
+                    </div>
+                </a>
+                <hr>
+                <a href="https://www.facebook.com/" style="text-decoration: none; color:blue;font-weight:bold">
+                    <div class="row" style="font-size: 20px">
+                        <div class="col-2">
+                            <i style="font-size: 30px;" class="fa fa-facebook"></i>
+                        </div>
+                        <div class="col-10">Vega Fruits</div>
+                    </div>
+                </a>
+                <hr>
+                <a href="https://twitter.com/"
+                    style="text-decoration: none; color:rgb(52, 153, 240);font-weight:bold">
+                    <div class="row" style="font-size: 20px">
+                        <div class="col-2">
+                            <i style="font-size: 30px;" class="fa fa-twitter"></i>
+                        </div>
+                        <div class="col-10">vegafruits</div>
+                    </div>
+                </a>
+            </div>
 
+        </div>
+    </div>
+
+    {{-- ABOUT US DIALOG --}}
+
+    <div id="about-dialog-container">
+        <div id="about-dialog" title="About Us">
+            <div class="text-center text-success py-1">
+                Vegafruits Tanzania Limited
+            </div>
+            <hr>
+            <div class="px-5">
+
+                <h2>SISI NDIO SISI</h2>
+
+            </div>
+
+        </div>
+    </div>
 
     {{-- SCRIPTS --}}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

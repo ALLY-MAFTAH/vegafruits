@@ -197,14 +197,14 @@ class OrderController extends Controller
             $customerAttr = [
                 "name" => session()->get('name'),
                 "mobile" => session()->get('mobile'),
-                "delivery_date" => session()->get('delivery_date'),
-                "delivery_time" => session()->get('delivery_time'),
 
             ];
             $customer = Customer::create($customerAttr);
 
             $orderAttr = [
                 "number" => 1,
+                "delivery_date" => session()->get('delivery_date'),
+                "delivery_time" => session()->get('delivery_time'),
                 "deliver_location" => session()->get('deliver_location'),
                 'date' => Carbon::now('GMT+3')->toDateString(),
                 'customer_id' => $customer->id

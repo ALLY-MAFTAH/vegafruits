@@ -16,6 +16,8 @@ class Order extends Model
         'status',
         'served_by',
         'customer_id',
+        'deliver_date',
+        'delivery_time',
         'deliver_location',
     ];
 

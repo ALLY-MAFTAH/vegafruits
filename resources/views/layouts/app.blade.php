@@ -29,7 +29,6 @@
 <body>
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
-            <div class="container">
                 <a class="" href="{{ url('/') }}">
                     <img src="{{ asset('assets/images/logo.png') }}" height="40px" alt="">
                 </a>
@@ -93,7 +92,7 @@
                         @endguest
                     </ul>
                 </div>
-            </div>
+
         </nav>
 
         <main class="py-4">

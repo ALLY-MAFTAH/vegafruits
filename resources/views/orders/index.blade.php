@@ -184,7 +184,10 @@
                     <th>Order Number</th>
                     <th>Created Date</th>
                     <th>Order Items</th>
-                    <th>Created By</th>
+                    <th>Delivery Location</th>
+                    <th>Delivery Date</th>
+                    <th>Delivery Time</th>
+                    <th>Customer</th>
                     <th>Phone</th>
                     <th>Served Date</th>
                     @if (Auth::user()->role_id == 1)
@@ -199,21 +202,21 @@
                     @foreach ($orders as $index => $order)
                         <tr>
                             <td>{{ ++$index }}</td>
-                            <td>
-                                {{ str_replace(' ', '', str_replace(':', '', str_replace('-', '', Illuminate\Support\Carbon::parse($order->number)))) }}
-                            </td>
+                            <td>{{ $order->number }}</td>
                             <td>{{ Illuminate\Support\Carbon::parse($order->created_at)->format('d M Y') }}</td>
-
                             <td>
                                 @foreach ($order->items as $item)
                                     <div>
-                                        {{ $item->name }} {{ $item->volume }} {{ $item->measure }} -
+                                        {{ $item->name }}  {{ $item->measure }} -
                                         {{ $item->quantity }} {{ $item->unit }},
                                     </div>
                                 @endforeach
                             </td>
-                            <td>{{ $order->created_by }}</td>
-                            <td>{{ $order->created_by }}</td>
+                            <td>{{ $order->deliver_location }}</td>
+                            <td>{{ $order->delivery_date }}</td>
+                            <td>{{ $order->delivery_time }}</td>
+                            <td>{{ $order->customer->name }}</td>
+                            <td>{{ $order->customer->mobile }}</td>
                             @if ($order->served_date != null)
                                 <td>{{ Illuminate\Support\Carbon::parse($order->served_date)->format('D, d M Y') }}</td>
                             @else
@@ -262,8 +265,7 @@
                                                         aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <form method="POST"
-                                                        action="{{ route('orders.edit', $order) }}">
+                                                    <form method="POST" action="{{ route('orders.edit', $order) }}">
                                                         @method('PUT')
                                                         @csrf
                                                         <div class="text-start mb-1">
@@ -325,7 +327,6 @@
     </div>
 @endsection
 @section('scripts')
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         var selectedStocks;
 

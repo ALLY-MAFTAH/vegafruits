@@ -16,6 +16,8 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->date('date');
+            $table->string('delivery_time');
+            $table->date('delivery_date');
             $table->string('number');
             $table->string('deliver_location');
             $table->date('served_date')->nullable();
