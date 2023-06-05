@@ -43,11 +43,6 @@
                 <a class="" href="{{ url('/') }}">
                     <img src="{{ asset('assets/images/logo.png') }}" height="40px" alt="">
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
             </div>
         </nav>
 
@@ -73,11 +68,11 @@
                         <div class="card mb-4 mt-1 shadow" style="background-color: rgba(176, 220, 182, 0.24)">
                             <div class="card-body py-1">
                                 <div class="row">
-                                    <div class="col-4 d-flex align-items-center justify-content-center">
-                                        <img src="{{ asset('assets/images/success.png') }}" width="110px"
-                                            height="100px" alt="">
+                                    <div class="col-3 d-flex align-items-center justify-content-center">
+                                        <img src="{{ asset('assets/images/success.png') }}" width="90px"
+                                            height="80px" alt="">
                                     </div>
-                                    <div class="col-8 text-start text-success" style="font-size:16px">
+                                    <div class="col-9 text-start text-success" style="font-size:16px">
 
                                         <div>
                                             Order Number: <b>{{ $order->number }}</b>
@@ -115,10 +110,12 @@
                     </div>
                     <div class="col-md-6 text-center">
                         <h5 style="color:rgb(135, 10, 10);font-weight:bold">Please make sure you pay for your order within next 1
-                            hour. Our staff will contact you soon after completing payment.</h5>
-                        <p class="text-grey">Payment Method</p>
-                        <img class="shadow" src="{{ asset('assets/images/LIPA NAMBA.jpg') }}" width="360px"
-                            height="100%" alt="">
+                            hour. Our staff will contact you soon after completing payment.</h5><br>
+                        <span class="text-grey">Payment Method</span>
+                        <img class="shadow" src="{{ asset('assets/images/LIPA NAMBA.jpg') }}" width="400px"
+                            height="80%" alt="">
+                        <br>
+                        <br>
                         <br>
                         <br>
                     </div>
