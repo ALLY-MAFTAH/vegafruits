@@ -117,7 +117,7 @@
                         <h5 style="color:rgb(135, 10, 10);font-weight:bold">Please make sure you pay for your order within next 1
                             hour. Our staff will contact you soon after completing payment.</h5>
                         <p class="text-grey">Payment Method</p>
-                        <img class="shadow" src="{{ asset('assets/images/LIPA NAMBA.jpg') }}" width="480px"
+                        <img class="shadow" src="{{ asset('assets/images/LIPA NAMBA.jpg') }}" width="360px"
                             height="100%" alt="">
                         <br>
                         <br>
