@@ -33,7 +33,8 @@ class NotificationService
         $result = curl_exec($ch);
         //var_dump($result);
         curl_close($ch);
-        dd($result);
-        return redirect()->back()->with('success', 'Notification Sent successfully.');
+        // dd($result);
+        return $result;
+        // return redirect()->back()->with('success', 'Notification Sent successfully.');
     }
 }
