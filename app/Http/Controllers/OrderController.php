@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Services\NotificationService;
 use Illuminate\Routing\Controller;
 
 use App\Models\Item;
@@ -33,68 +34,29 @@ class OrderController extends Controller
 
         return view('orders.index', compact('orders', 'stocks'));
     }
+    public function getOrdersApi()
+    {
+        try {
+
+            $orders = Order::with('items')->with('customer')->latest()->get();
+
+            return response()->json([
+                'orders' => $orders,
+                'status' => true
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'orders' => $th->getMessage(),
+                'status' => false
+            ], 201);
+        }
+    }
 
     public function showOrder(Request $request, Order $order)
     {
         return view('orders.show', compact('order'));
     }
 
-    public function sendOrder(Request $request)
-    {
-        $selectedStocks = json_decode($request->selectedStocks, true);
-
-        try {
-
-            $attributes = [
-                'number' => Carbon::now(),
-                'served_date' => null,
-                'status' => false,
-                'created_by' => Auth::user()->name,
-                'user_id' => Auth::user()->id,
-            ];
-
-            $order = Order::create($attributes);
-            $user = User::find(Auth::user()->id);
-            $user->orders()->save($order);
-
-            foreach ($selectedStocks as $stock) {
-                $itemAttributes = [
-                    'stock_id' => $stock['stock_id'],
-                    'name' => $stock['name'],
-                    'quantity' => $stock['quantity'],
-                    'volume' => $stock['volume'],
-                    'measure' => $stock['measure'],
-                    'unit' => $stock['unit'],
-                    'order_id' => $order->id,
-                ];
-
-                $item = Item::create($itemAttributes);
-                $order->items()->save($item);
-            }
-
-            $receivers = [
-                setting('Admin Email'),
-                setting('Afya Email'),
-
-            ];
-            foreach ($receivers as $receiver) {
-
-                Mail::send('mails.order', ['order' => $selectedStocks], function ($m) use ($receiver) {
-                    $m->from('amelipaapp@gmail.com', setting('App Name', "Tanga Watercom"));
-
-                    $m->to($receiver)->subject('Please, receive new order.');
-                });
-            }
-
-
-            notify()->success('You have successful sent an order');
-            return redirect()->back();
-        } catch (QueryException $th) {
-            dd($th->getMessage());
-            notify()->error($th->getMessage());
-            return back()->with('error', 'Failed to create order');
-        }
-    }
     public function postOrder(Request $request)
     {
         $itemsIds = $request->input('ids');
@@ -153,7 +115,36 @@ class OrderController extends Controller
                 return back()->with('error', 'OTP not sent, crosscheck your inputs');
             }
         } catch (\Throwable $th) {
-            dd($th->getMessage());
+
+            return back()->with('error', $th->getMessage());
+        }
+    }
+    public function resendOTP()
+    {
+        try {
+
+            $mobile = session('mobile');
+
+            $otp = mt_rand(1000, 9999);
+            session(['otp' => $otp]);
+
+            $messageBody = "Your Vega Fruits Verification Code is: " . $otp;
+
+            $messagingService = new MessagingService();
+            $sendMessageResponse = $messagingService->sendMessage($mobile, $messageBody);
+
+            $lastFourDigits = substr($mobile, -4);
+
+            if ($sendMessageResponse == "Sent") {
+                session(['verifyOTPDialog' => true]);
+                session(['lastFourDigits' => $lastFourDigits]);
+
+                return back();
+            } else {
+                return back()->with('error', 'OTP not sent, crosscheck your inputs');
+            }
+        } catch (\Throwable $th) {
+
             return back()->with('error', $th->getMessage());
         }
     }
@@ -162,7 +153,6 @@ class OrderController extends Controller
         if (!session('otp')) {
 
             return Redirect::route('welcome');
-
         } else {
 
             $otp = $request->first . $request->second . $request->third . $request->fourth;
@@ -178,6 +168,10 @@ class OrderController extends Controller
 
                     if ($orderResponse['status'] == "Sent") {
                         $order = $orderResponse['data'];
+                        $notificationRequest = new Request(['title' => "New Order :: " . $order->number, 'body' => "Please check your order list, new order has been created by ".$order->customer->name. " [ ".$order->customer->mobile." ]"]);
+                        $notificationService =  new NotificationService();
+                        $notificationResponse =  $notificationService->sendNotification($notificationRequest);
+
                         return Redirect::route('payments', $order)->with(['success' => 'Order created successfully']);
                     } else {
                         return back()->with('error', $orderResponse['data']);
@@ -241,6 +235,7 @@ class OrderController extends Controller
             }
 
             $order->update(['total_amount' => $totalAmount]);
+
             session()->forget('cart');
             session(['paymentModal' => true]);
 

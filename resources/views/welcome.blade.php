@@ -320,7 +320,7 @@
                     </div>
                 @endif
                 <div class="d-flex justify-content-center align-items-center"> <span>Didn't get the
-                        code? &nbsp;&nbsp; </span> <a href="#" style="text-decoration:none"
+                        code? &nbsp;&nbsp; </span> <a href="{{route('orders.resend_OTP')}}" style="text-decoration:none"
                         class="text-primary"> Resend</a>
                 </div>
             </div>
