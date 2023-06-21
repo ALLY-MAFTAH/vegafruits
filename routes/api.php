@@ -15,7 +15,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/orders', [OrderController::class, 'getOrdersApi'])->name('orders.index');
+Route::get('/new-orders', [OrderController::class, 'getNewOrdersApi']);
+Route::match(['PATCH', 'PUT'],'/mark-order-as-paid/{orderId}', [OrderController::class, 'markOrderAsPaid']);
+Route::match(['PATCH', 'PUT'],'/mark-order-as-served/{orderId}', [OrderController::class, 'markOrderAsServed']);
+Route::match(['PATCH', 'PUT'],'/mark-order-as-contacted/{orderId}', [OrderController::class, 'markOrderAsContacted']);
+
+
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

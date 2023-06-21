@@ -24,6 +24,8 @@ return new class extends Migration
             $table->date('served_date')->nullable();
             $table->string('served_by')->nullable();
             $table->boolean('status')->default(false);
+            $table->boolean('is_paid')->default(false);
+            $table->boolean('was_contacted')->default(false);
             $table->bigInteger('customer_id');
             $table->timestamps();
             $table->softDeletes();

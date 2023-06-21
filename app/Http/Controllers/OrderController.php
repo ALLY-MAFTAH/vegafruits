@@ -34,11 +34,11 @@ class OrderController extends Controller
 
         return view('orders.index', compact('orders', 'stocks'));
     }
-    public function getOrdersApi()
+    public function getNewOrdersApi()
     {
         try {
 
-            $orders = Order::with('items')->with('customer')->latest()->get();
+            $orders = Order::where('status',false)->with('items')->with('customer')->latest()->get();
 
             return response()->json([
                 'orders' => $orders,
@@ -245,54 +245,46 @@ class OrderController extends Controller
         }
     }
 
-    // public function putOrder(Request $request, Order $order)
-    // {
+    public function markOrderAsPaid(Request $request, $orderId)
+    {
+    try {
+        $order = Order::findOrFail($orderId);
+        $order->is_paid = $request->input('is_paid');
+        $order->save();
 
-    //     try {
-    //         $attributes = $request->validate([
-    //             'volume' => 'required',
-    //             'unit' => 'required',
-    //             'measure' => 'required',
-    //             'price' => 'required',
-    //         ]);
+        return response()->json(['message' => 'Order marked as paid successfully']);
+    } catch (\Exception $e) {
 
-    //         $order->update($attributes);
-    //     } catch (QueryException $th) {
-    //         notify()->error('Order "' . $request->name . '" with volume of "' . $request->quantity . '" already exists.');
-    //         return back();
-    //     }
-    //     notify()->success('You have successful edited an order');
-    //     return redirect()->back();
-    // }
+        return response()->json(['message' => $e], 500);
+    }
+    }
+    public function markOrderAsContacted(Request $request, $orderId)
+    {
+    try {
+        $order = Order::findOrFail($orderId);
+        $order->was_contacted = $request->input('was_contacted');
+        $order->save();
 
-    // public function toggleStatus(Request $request, Order $order)
-    // {
-    //     try {
+        return response()->json(['message' => 'Customer contacted']);
+    } catch (\Exception $e) {
 
-    //         $attributes = $request->validate([
-    //             'status' => ['required', 'boolean'],
-    //         ]);
-    //         $attributes['served_date'] =  Carbon::now();
+        return response()->json(['message' => $e], 500);
+    }
+    }
+    public function markOrderAsServed(Request $request, $orderId)
+    {
+    try {
+        $order = Order::findOrFail($orderId);
+        $order->status = $request->input('status');
+        $order->save();
 
-    //         $order->update($attributes);
+        return response()->json(['message' => 'Order served successful']);
+    } catch (\Exception $e) {
 
-    //         $items = Item::where(['order_id' => $order->id])->get();
-    //         foreach ($items as $item) {
-    //             $stock = Stock::findOrFail($item->stock_id);
+        return response()->json(['message' => $e], 500);
+    }
+}
 
-    //             $newQuantity = $stock->quantity + $item->quantity;
-    //             $attributes = [
-    //                 'quantity' => $newQuantity
-    //             ];
-    //             $stock->update($attributes);
-    //         }
-    //     } catch (QueryException $th) {
-    //         notify()->error($th->getMessage());
-    //         return back();
-    //     }
-    //     notify()->success('You have successfully updated order status');
-    //     return back();
-    // }
 
     public function deleteOrder(Order $order)
     {

@@ -13,12 +13,14 @@ class Order extends Model
         'date',
         'number',
         'status',
+        'is_paid',
         'served_by',
         'served_date',
         'customer_id',
         'total_amount',
         'delivery_date',
         'delivery_time',
+        'was_contacted',
         'delivery_location',
     ];
 
