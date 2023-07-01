@@ -12,7 +12,7 @@ class StockController extends Controller
 
     public function index()
     {
-        $orders = Stock::orderBy('type', 'DESC')->get();
+        $stocks = Stock::orderBy('type', 'DESC')->get();
 
         return view('stocks.index', compact('stocks'));
     }
