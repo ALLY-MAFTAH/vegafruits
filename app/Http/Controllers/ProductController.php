@@ -119,6 +119,18 @@ class ProductController extends Controller
 
     }
 
+    public function viewProductPhoto($productId)
+    {
+        $product = Product::find($productId);
+        if (!$product) {
+            return response()->json([
+                'error' => 'Product not found'
+            ], 404);
+        }
+
+        $pathToFile = storage_path('/app/public/' . $product->photo);
+        return response()->download($pathToFile);
+    }
     // DELETE PRODUCT
     public function deleteProduct(Product $product)
     {

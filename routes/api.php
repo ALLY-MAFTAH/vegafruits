@@ -21,6 +21,9 @@ Route::match(['PATCH', 'PUT'],'/mark-order-as-served/{orderId}', [OrderControlle
 Route::match(['PATCH', 'PUT'],'/mark-order-as-contacted/{orderId}', [OrderController::class, 'markOrderAsContacted']);
 
 
+Route::get('/stocks', [StockController::class, 'getStocksApi']);
+Route::get('product/photo/{productId}', [ProductController::class,'viewProductPhoto']);
+
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

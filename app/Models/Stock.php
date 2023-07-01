@@ -15,7 +15,6 @@ class Stock extends Model
         'name',
         'quantity',
         'type',
-        'measure',
         'unit',
         'buying_price',
         'status',

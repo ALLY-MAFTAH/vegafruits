@@ -10,16 +10,27 @@ use Illuminate\Routing\Controller;
 class StockController extends Controller
 {
 
-
-    /**
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
     public function index()
     {
-        $stocks = Stock::orderBy('type', 'DESC')->get();
+        $orders = Stock::orderBy('type', 'DESC')->get();
 
         return view('stocks.index', compact('stocks'));
+    }
+    public function getStocksApi()
+    {
+        try {
+            $stocks = Stock::with('product')->orderBy('type', 'DESC')->get();
+
+            return response()->json([
+                'stocks' => $stocks,
+                'status' => true
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'stocks' => $th->getMessage(),
+                'status' => false
+            ], 201);
+        }
     }
     public function showStock(Request $request, Stock $stock)
     {
