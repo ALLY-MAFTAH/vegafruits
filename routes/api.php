@@ -24,6 +24,11 @@ Route::match(['PATCH', 'PUT'],'/mark-order-as-contacted/{orderId}', [OrderContro
 Route::get('/stocks', [StockController::class, 'getStocksApi']);
 Route::get('product/photo/{productId}', [ProductController::class,'viewProductPhoto']);
 
+// CUSTOMERS
+Route::get('/customers', [CustomerController::class, 'index']);
+
+// SALES
+Route::get('/sales', [SaleController::class, 'allSales']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

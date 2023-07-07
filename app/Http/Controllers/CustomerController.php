@@ -8,22 +8,33 @@ use Illuminate\Routing\Controller;
 use App\Models\Customer;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Request as REQ;
 
 class CustomerController extends Controller
 {
-    /**
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
     public function index()
     {
-        $customers = Customer::latest()->get();
+        try {
+            $customers = Customer::all();
 
-        // foreach ($customers as $key => $value) {
-        //     dd($value->goods);
-        // }
-        return view('customers.index', compact('customers'));
+            if (REQ::is('api/*')) {
+                return response()->json([
+                    'customers'=>$customers,
+                    'status'=>true,
+                ]);
+            }
+            return view('customers.index', compact('customers'));
+
+        } catch (\Throwable $th) {
+            if (REQ::is('api/*')) {
+                return response()->json([
+                    'error'=>$th->getMessage(),
+                    'status'=>false,
+                ]);
+            }
+            return back()->with('error', $th->getMessage());
+
+        }
     }
 
     // SHOW CUSTOMER
@@ -36,33 +47,22 @@ class CustomerController extends Controller
     public function postCustomer(Request $request)
     {
         try {
-            $attributes = $request->validate([
-                'name' => 'required',
-                'phone' => 'required',
-            ]);
 
-            $customer =  self::addCustomer($attributes);
+            $customer=Customer::where('mobile',$request->mobile)->first();
 
-            // $customer = Customer::create($attributes);
+            if (!$customer) {
+                $attributes = $request->validate([
+                    'name' => 'required',
+                    'mobile' => 'required',
+                ]);
 
-        } catch (QueryException $th) {
-
-            return back()->with('error', $th->getMessage());
-        }
-        return back()->with('success', "Customer added successful");
-
-        return Redirect::back();
-    }
-    public function addCustomer($attributes)
-    {
-        try {
-
-            $customer = Customer::create($attributes);
+                $customer = Customer::create($attributes);
+            }
 
             return $customer;
         } catch (QueryException $th) {
-            notify()->error($th->getMessage());
-            return back();
+
+            return back()->with('error', $th->getMessage());
         }
     }
 
@@ -77,10 +77,8 @@ class CustomerController extends Controller
 
             $customer->update($attributes);
         } catch (QueryException $th) {
-            notify()->error($th->getMessage());
             return back();
         }
-        notify()->success('You have successful edited customer');
         return redirect()->back();
     }
 
@@ -93,9 +91,6 @@ class CustomerController extends Controller
         ]);
 
         $customer->update($attributes);
-
-
-        notify()->success('You have successfully updated customer status');
         return back();
     }
 
@@ -105,9 +100,6 @@ class CustomerController extends Controller
 
         $itsName = $customer->name;
         $customer->delete();
-
-
-        notify()->success('You have successful deleted ' . $itsName . '.');
         return back();
     }
 }

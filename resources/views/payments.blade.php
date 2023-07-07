@@ -228,7 +228,7 @@
     <script>
         $(document).ready(function() {
 
-            @if (session('verifyOTPDialog'))
+            @if (session('verifyOTPDialog')&&session('cart'))
                 var otpDialogContainer = $("#otp-dialog-container");
                 var otpDialog = $("#otp-dialog").dialog({
                     autoOpen: false,

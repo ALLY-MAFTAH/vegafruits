@@ -106,7 +106,7 @@ class OrderController extends Controller
             // $sendMessageResponse = "Sent";
             $lastFourDigits = substr($request->mobile, -4);
 
-            if ($sendMessageResponse == "Sent") {
+            if ($sendMessageResponse == "Sent"&&session('cart')) {
                 session(['verifyOTPDialog' => true]);
                 session(['lastFourDigits' => $lastFourDigits]);
 
@@ -135,7 +135,7 @@ class OrderController extends Controller
 
             $lastFourDigits = substr($mobile, -4);
 
-            if ($sendMessageResponse == "Sent") {
+            if ($sendMessageResponse == "Sent"&& session('cart')) {
                 session(['verifyOTPDialog' => true]);
                 session(['lastFourDigits' => $lastFourDigits]);
 
@@ -189,12 +189,13 @@ class OrderController extends Controller
         $carts = session()->get('cart');
 
         try {
-            $customerAttr = [
+            $customerRequest = new Request( [
                 "name" => session()->get('name'),
                 "mobile" => session()->get('mobile'),
 
-            ];
-            $customer = Customer::create($customerAttr);
+            ]);
+            $customerController=new CustomerController();
+            $customer = $customerController->postCustomer($customerRequest);
 
             $lastOrderRow = Order::latest('created_at')->latest('id')->first();
             $lastOrderNumber = $lastOrderRow ? $lastOrderRow->number : "VFO/00000";

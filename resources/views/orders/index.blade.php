@@ -5,6 +5,21 @@
 @section('style')
 @endsection
 @section('content')
+    @if (session('info'))
+        <div class="alert alert-info" role="alert">
+            {{ session('info') }}
+        </div>
+    @endif
+    @if (session('success'))
+        <div class="alert alert-success" role="alert">
+            {{ session('success') }}
+        </div>
+    @endif
+    @if (session('error'))
+        <div class="alert alert-danger" role="alert">
+            {{ session('error') }}
+        </div>
+    @endif
     <div class="card">
         <div class=" card-header">
             <div class="row">
@@ -22,9 +37,6 @@
                         </h5>
                     </div>
                 </div>
-                {{-- <div class="col text-end">
-
-                </div> --}}
             </div>
         </div>
         <div class="card-body">
@@ -47,7 +59,8 @@
                                                     <option value="">{{ 'Please Select Product' }}</option>
                                                     @foreach ($stocks as $stock)
                                                         <option value="{{ $stock->id }}">{{ $stock->name }} -
-                                                            {{ $stock->volume }} {{ $stock->measure }} ({{ $stock->unit }})
+                                                            {{ $stock->volume }} {{ $stock->measure }}
+                                                            ({{ $stock->unit }})
                                                         </option>
                                                     @endforeach
                                                     @error('order_name')
@@ -187,17 +200,10 @@
                     <th>Amount</th>
                     <th>Delivery Location</th>
                     <th>Delivery Date</th>
-                    <th>Delivery Time</th>
                     <th>Customer</th>
-                    <th>Phone</th>
                     <th>Served Date</th>
-                    @if (Auth::user()->role_id == 1)
-                        <th style="max-width: 50px">Order Status</th>
-                        <th hidden></th>
-                        <th hidden></th>
-                        <th></th>
-                    @endif
-
+                    <th></th>
+                    <th></th>
                 </thead>
                 <tbody>
                     @foreach ($orders as $index => $order)
@@ -213,114 +219,50 @@
                                     </div>
                                 @endforeach
                             </td>
-                            <td>{{number_format($order->total_amount,0,'.',',') }} Tsh</td>
+                            <td>{{ number_format($order->total_amount, 0, '.', ',') }} Tsh </td>
                             <td>{{ $order->delivery_location }}</td>
-                            <td>{{ Illuminate\Support\Carbon::parse($order->delivery_date)->format('D, d M, Y') }}</td>
-                            <td>{{ $order->delivery_time }}</td>
-                            <td>{{ $order->customer->name }}</td>
-                            <td>{{ $order->customer->mobile }}</td>
+                            <td>
+                                <div>
+
+                                    {{ Illuminate\Support\Carbon::parse($order->delivery_date)->format('D, d M, Y') }}
+                                </div>
+                                <div>
+                                    {{ ' at ' . $order->delivery_time }}
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    {{ $order->customer->name }}
+                                </div>
+                                <div>
+
+                                    {{ $order->customer->mobile }}
+                                </div>
+                            </td>
                             @if ($order->served_date != null)
                                 <td>{{ Illuminate\Support\Carbon::parse($order->served_date)->format('D, d M Y') }}</td>
                             @else
                                 <td>Not Served</td>
                             @endif
-                            @if (Auth::user()->role_id == 1)
-                                @if ($order->served_date == null)
-                                    <td class="text-center">
-                                        <form id="toggle-status-form-{{ $order->id }}" method="POST"
-                                            action="{{ route('orders.toggle-status', $order) }}">
-                                            <div class="form-check form-switch ">
-                                                <input type="hidden" name="status" value="0">
-                                                <input type="checkbox" name="status"
-                                                    id="status-switch-{{ $order->id }}" class="form-check-input "
-                                                    @if ($order->status) checked @endif
-                                                    @if ($order->trashed()) disabled @endif value="1"
-                                                    onclick="this.form.submit()" />
-                                            </div>
-                                            @csrf
-                                            @method('PUT')
-                                        </form>
-                                    </td>
-                                @else
-                                    <td><label style="padding:5px;background:rgb(161, 227, 161)">Served</label></td>
-                                @endif
-                                <td hidden>
-                                    <a href="{{ route('orders.show', $order) }}"
-                                        class="btn btn-sm btn-outline-info collapsed" type="button">
-                                        <i class="feather icon-edit"></i> View
-                                    </a>
-                                </td>
 
-                                <td hidden class="text-center">
-                                    <a href="#" class="btn btn-sm btn-outline-primary collapsed" type="button"
-                                        data-bs-toggle="modal" data-bs-target="#editModal-{{ $order->id }}"
-                                        aria-expanded="false" aria-controls="orderSummary">
-                                        <i class="feather icon-edit"></i> Edit
-                                    </a>
-                                    <div class="modal modal-sm fade" id="editModal-{{ $order->id }}" tabindex="-1"
-                                        aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="exampleModalLabel">Edit Order</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                        aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <form method="POST" action="{{ route('orders.edit', $order) }}">
-                                                        @method('PUT')
-                                                        @csrf
-                                                        <div class="text-start mb-1">
-                                                            <label for="name"
-                                                                class=" col-form-label text-sm-start">{{ __('Full Name') }}</label>
-                                                            <input id="name" type="text" placeholder=""
-                                                                class="form-control @error('name') is-invalid @enderror"
-                                                                name="name" value="{{ old('name', $order->name) }}"
-                                                                required autocomplete="name" autofocus>
-                                                            @error('name')
-                                                                <span class="invalid-feedback" role="alert">
-                                                                    <strong>{{ $message }}</strong>
-                                                                </span>
-                                                            @enderror
-                                                        </div>
-                                                        <div class="text-start mb-1">
-                                                            <label for="phone"
-                                                                class="col-form-label text-sm-start">{{ __('Mobile Number') }}</label>
-                                                            <input id="phone" type="text"
-                                                                placeholder="+25571012345"
-                                                                class="form-control @error('phone', $order->phone) is-invalid @enderror"
-                                                                name="phone" value="{{ old('phone', $order->phone) }}"
-                                                                required autocomplete="phone" autofocus>
-                                                            @error('phone')
-                                                                <span class="invalid-feedback" role="alert">
-                                                                    <strong>{{ $message }}</strong>
-                                                                </span>
-                                                            @enderror
-
-                                                        </div>
-                                                        <div class="row mb-1 mt-2">
-                                                            <div class="text-center">
-                                                                <button type="submit" class="btn btn-sm btn-primary">
-                                                                    {{ __('Submit') }}
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
+                            @if ($order->served_date == null)
                                 <td class="text-center">
-                                    <a href="#" class="btn btn-sm btn-outline-danger"
-                                        onclick="if(confirm('Are you sure want to delete {{ $order->name }}?')) document.getElementById('delete-role-{{ $order->id }}').submit()">
-                                        <i class="f"></i>Delete
-                                    </a>
-                                    <form id="delete-role-{{ $order->id }}" method="post"
-                                        action="{{ route('orders.delete', $order) }}">@csrf @method('delete')
-                                    </form>
+                                    <a href="{{ route('sales.sell', $order) }}"
+                                        class="btn btn-sm btn-outline-success">SELL</a>
                                 </td>
+                            @else
+                                <td><label style="padding:5px;background:rgb(161, 227, 161)">Served</label></td>
                             @endif
+
+                            <td class="text-center">
+                                <a href="#" class="btn btn-sm btn-outline-danger"
+                                    onclick="if(confirm('Are you sure want to delete {{ $order->name }}?')) document.getElementById('delete-role-{{ $order->id }}').submit()">
+                                    <i class="f"></i>Delete
+                                </a>
+                                <form id="delete-role-{{ $order->id }}" method="post"
+                                    action="{{ route('orders.delete', $order) }}">@csrf @method('delete')
+                                </form>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>

@@ -13,20 +13,18 @@ class Sale extends Model
 
     protected $fillable = [
         'product_id',
+        'customer_id',
         'stock_id',
         'good_id',
         'user_id',
         'seller',
         'name',
         'volume',
-        'measure',
         'quantity',
         'unit',
         'price',
         'date',
         'type',
-        'status',
-
     ];
 
     protected $dates = [
@@ -39,7 +37,7 @@ class Sale extends Model
     }
     public function customer()
     {
-        return  $this->belongsTo(Customer::class);
+        return  $this->belongsTo(Customer::class,'customer_id');
     }
     public function stock()
     {

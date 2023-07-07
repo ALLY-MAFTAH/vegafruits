@@ -28,7 +28,7 @@ Route::post('/cart/remove', [CartController::class, 'removeFromCart'])->name('ca
 Route::post('/cart/empty', [CartController::class, 'emptyCart'])->name('cart.empty');
 Route::post('/add-customer_info', [OrderController::class, 'customerInfo'])->name('orders.customer_info');
 Route::post('/verify-OTP', [OrderController::class, 'verifyOTP'])->name('orders.verify_OTP');
-Route::post('/resend-OTP', [OrderController::class, 'resendOTP'])->name('orders.resend_OTP');
+Route::get('/resend-OTP', [OrderController::class, 'resendOTP'])->name('orders.resend_OTP');
 Route::get('/payments/{order}', [OrderController::class, 'payments'])->name('payments');
 
 // NOTIFICATIONS ROUTES
@@ -77,4 +77,5 @@ Route::middleware(['auth'])->group(function () {
 
     // SALES ROUTES
     Route::get('/sales', [SaleController::class, 'allSales'])->name('sales.index');
+    Route::get('/sell-product/{order}', [SaleController::class, 'sellProduct'])->name('sales.sell');
 });

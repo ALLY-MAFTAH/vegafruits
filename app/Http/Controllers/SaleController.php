@@ -7,6 +7,7 @@ use Illuminate\Routing\Controller;
 use App\Helpers\ActivityLogHelper;
 use App\Models\Customer;
 use App\Models\Good;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\Stock;
@@ -14,17 +15,14 @@ use App\Services\MessagingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Request as REQ;
 
 class SaleController extends Controller
 {
 
-    /**
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
     public function index(Request $request)
     {
+
 
         $filteredStockName = "";
         $filteredDate = Carbon::now('GMT+3')->toDateString();
@@ -59,36 +57,37 @@ class SaleController extends Controller
     }
 
     // SELL PRODUCT
-    public function saleProduct(Request $request)
+    public function sellProduct(Request $request, $orderId)
     {
-        // dd(setting('App Name'));
-        $carts = session()->get('cart');
+    try {
+        $order = Order::findOrFail($orderId);
+
+        if (!$order) {
+            return response()->json(['error',"Order not found or expired expired"]);
+        }
         $purchases = [];
 
-        foreach ($carts as $cart) {
-            $product = Product::findOrFail($cart['id']);
-            $quantity = $cart['quantity'];
+        foreach ($order->items as $item) {
+            $product = Product::find($item->product_id);
+            $quantity = $item->quantity;
 
             $stock = Stock::findOrFail($product->stock_id);
             if ($quantity > $stock->quantity) {
-                notify()->error("Sorry! You can't sell " . $quantity . " " . $product->unit . " of " . $product->name . ' - ' . $product->volume . ' ' . $product->measure . ". Quantity remained is " . $stock->quantity . " " . $product->unit);
-                return back();
+               return back()->with('error',"Sorry! You can't sell " . $quantity . " " . $product->unit . " of " . $product->name . ' - ' . $product->volume . ' ' . $product->measure . ". Quantity remained is " . $stock->quantity . " " . $product->unit);
             }
         }
 
-        try {
-            foreach ($carts as $cart) {
-                $product = Product::findOrFail($cart['id']);
-                $quantity = $cart['quantity'];
+            foreach ($order->items as $item) {
+                $product = Product::find($item->product_id);
+                $quantity = $item->quantity;
 
-                $stock = Stock::findOrFail($product->stock_id);
+                $stock = Stock::find($product->stock_id);
 
                 $attributes = [
                     'name' => $product->name,
                     'type' => $product->type,
                     'volume' => $product->volume,
-                    'measure' => $product->measure,
-                    'price' => $cart['price'] * $quantity,
+                    'price' => $item->price * $quantity,
                     'quantity' => $quantity,
                     'unit' => $product->unit,
                     'seller' => Auth::user()->name,
@@ -97,7 +96,7 @@ class SaleController extends Controller
                     'date' => Carbon::now('GMT+3')->toDateString(),
                     'stock_id' => $product->stock_id,
                     'good_id' => 0,
-                    'status' => true,
+
                 ];
                 $sale = Sale::create($attributes);
                 $stock->sales()->save($sale);
@@ -127,20 +126,22 @@ class SaleController extends Controller
                 $purchase->update($at);
                 $good->purchases()->save($purchase);
             }
-
-            if ($request->customer_id != null) {
-                $customer = Customer::findOrFail($request->customer_id);
+                $customer = Customer::find($order->customer_id);
                 $atr = ['customer_id' => $customer->id];
                 $good->update($atr);
                 $customer->goods()->save($good);
 
+                $order->status = 1;
+                $order->served_date = Carbon::now('GMT+3')->toDateString();
+                $order->served_by = Auth::user()->name;
+                $order->save();
                 // MESSAGE CONTENT
                 $heading  = "Ndugu mteja,\nUmenunua bidhaa zifuatazo kutoka kwetu\n";
                 $boughtGoods = [];
                 foreach ($purchases as $key => $purchasedGood) {
                     $boughtGoods[] = ++$key . ". " . $purchasedGood->name . " " . $purchasedGood->volume . " " . $purchasedGood->measure . " - " . $purchasedGood->quantity . " " . $purchasedGood->unit . "\n";
                 }
-                $totalCost = "Zinazogharimu Jumla ya Tsh " . number_format($totalAmount, 0, '.', ',') . ".\n";
+                $totalCost = "Zinazogharimu Jumla ya TZS " . number_format($totalAmount, 0, '.', ',') . ".\n";
                 $closing  = "Ahsante na karibu tena.";
                 $messageBody = $heading . implode('', $boughtGoods) . $totalCost . $closing;
 
@@ -148,127 +149,28 @@ class SaleController extends Controller
                 $sendMessageResponse = $messagingService->sendMessage($customer->phone, $messageBody);
 
                 if ($sendMessageResponse == "Sent") {
-                    ActivityLogHelper::addToLog('Sent sms to customer. Number: ' . $customer->phone);
-                    notify()->success('Message successful sent.');
+                    return back()->with('success','Order successful sold');
                 } else {
-                    notify()->error('Message not sent, crosscheck your inputs');
+                    return back()->with('error','Order successful sold but message not sent, crosscheck your inputs');
                 }
-            }
 
-            ActivityLogHelper::addToLog('Successful sold products.');
-            session()->forget('cart');
         } catch (\Throwable $th) {
-            // dd($th->getMessage());
-            notify()->error($th->getMessage());
-            return back();
+           return back()->with('error',$th->getMessage());
         }
 
-        notify()->success('Sales recorded successfully');
-        return Redirect::back();
-    }
-    public function checkCart()
-    {
-        if (session()->has('cart')) {
-            $cartData = session()->get('cart');
-        }
-        return response()->json(['cartData' => $cartData]);
-    }
-    public function getCartData()
-    {
-        $cart = session()->get('cart', []);
-        $customers = Customer::all();
-        return response()->json(['cart' => $cart, 'customers' => $customers]);
-    }
+}
 
-    public function addToCart($id)
-    {
-        $product = Product::findOrFail($id);
-        $cart = session()->get('cart', []);
 
-        // print($cart[$id]['quantity']);
-        if (isset($cart[$id])) {
-            $cart[$id]['quantity']++;
-            if ($cart[$id]['quantity'] >= setting('Discount Limit Quantity', 10) && $product->has_discount) {
-                $cart[$id]['price'] = $product->price - setting('Discount Amount', 200);
-            } else {
-                $cart[$id]['price'] = $product->price;
-            }
-            session()->put('cart', $cart);
-        } else {
-            $cart[$id] = [
-                "id" => $product->id,
-                "name" => $product->name,
-                "quantity" => 1,
-                "price" => $product->price,
-                "volume" => $product->volume,
-                "measure" => $product->measure,
-            ];
-            session()->put('cart', $cart);
-        }
-        return response()->json(['count' => count($cart)], 200);
-    }
-
-    /**
-     * Write code on Method
-     *
-     * @return response()
-     */
-    public function update(Request $request)
-    {
-        $product = Product::findOrFail($request->id);
-
-        if ($request->id && $request->quantity) {
-            $cart = session()->get('cart');
-            $cart[$request->id]["quantity"] = $request->quantity;
-
-            if ($cart[$request->id]["quantity"] >= setting('Discount Limit Quantity', 10) && $product->has_discount) {
-                $cart[$request->id]["price"] = $product->price - setting('Discount Amount', 200);
-            } else {
-                $cart[$request->id]["price"] =  $product->price;
-            }
-            session()->put('cart', $cart);
-        }
-        $total = 0;
-        foreach ($cart as $item) {
-
-            $total += $item['quantity'] * $item['price'];
-        }
-
-        return response()->json(['success' => 'Cart quantity updated', 'newPrice' => $cart[$request->id]["price"], 'total' => number_format($total, 0, '.', ',')], 200);
-    }
-
-    /**
-     * Write code on Method
-     *
-     * @return response()
-     */
-    public function remove(Request $request)
-    {
-        if ($request->id) {
-            $cart = session()->get('cart');
-            if (isset($cart[$request->id])) {
-                unset($cart[$request->id]);
-                session()->put('cart', $cart);
-            }
-            $total = 0;
-            foreach ($cart as $item) {
-                $total += $item['quantity'] * $item['price'];
-            }
-            return response()->json(['total' => number_format($total, 0, '.', ','), 'count' => count($cart), 'success' => 'Product successfull removed from cart'], 200);
-        }
-    }
-
-    public function empty()
-    {
-        // Empty the cart
-        session()->forget('cart');
-
-        session()->flash('success', 'Cart emptied successfully');
-        return back();
-    }
 
     public function allSales(Request $request)
     {
+        if (REQ::is('api/*')) {
+            $goods=Good::all();
+            return response()->json([
+                'goods'=>$goods,
+                'status'=>true,
+            ]);
+        }
         $filteredStockId = $request->get('filteredStockId', "All Products");
         $filteredDate = $request->get('filteredDate', "All Days");
 

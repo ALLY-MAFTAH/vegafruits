@@ -15,17 +15,16 @@ return new class extends Migration
     {
         Schema::create('sales', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('customer_id');
+            $table->bigInteger('customer_id')->nullable();
             $table->date('date');
             $table->bigInteger('product_id');
             $table->bigInteger('stock_id');
             $table->string('name');
-            $table->string('measure');
+            $table->double('volume');
             $table->string('type')->nullable();
             $table->double('quantity');
             $table->string('unit');
             $table->double('price');
-            $table->boolean('status');
             $table->timestamps();
             $table->softDeletes();
         });

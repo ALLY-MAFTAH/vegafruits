@@ -23,6 +23,14 @@ class Customer extends Model
     {
         return  $this->hasMany(Good::class);
     }
+    public function orders()
+    {
+        return  $this->hasMany(Order::class);
+    }
+    public function sales()
+    {
+        return  $this->hasMany(Sale::class);
+    }
     public function messages()
     {
         return  $this->hasMany(Message::class);
