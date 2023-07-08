@@ -22,7 +22,13 @@ class SaleController extends Controller
 
     public function index(Request $request)
     {
-
+        if (REQ::is('api/*')) {
+            $sales=Sale::all();
+            return response()->json([
+                'goods'=>$sales,
+                'status'=>true,
+            ]);
+        }
 
         $filteredStockName = "";
         $filteredDate = Carbon::now('GMT+3')->toDateString();
@@ -167,7 +173,7 @@ class SaleController extends Controller
         if (REQ::is('api/*')) {
             $goods=Good::all();
             return response()->json([
-                'goods'=>$goods,
+                'sales'=>$goods,
                 'status'=>true,
             ]);
         }

@@ -29,6 +29,7 @@ Route::get('/customers', [CustomerController::class, 'index']);
 
 // SALES
 Route::get('/sales', [SaleController::class, 'allSales']);
+Route::get('/goods', [SaleController::class, 'index']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
