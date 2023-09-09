@@ -9,7 +9,7 @@ class MessagingService
 
     public function sendMessage($mobile, $body)
     {
-        $from = 'NEXTSMS';
+        $from = 'RMNDR';
         $text = $body;
         $to = substr_replace($mobile, "255", 0, 1);
 

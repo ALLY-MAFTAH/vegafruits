@@ -20,68 +20,37 @@ use Illuminate\Support\Facades\Request as REQ;
 class SaleController extends Controller
 {
 
-    public function index(Request $request)
+    public function getAllGoods(Request $request)
     {
         if (REQ::is('api/*')) {
-            $sales=Sale::all();
+            $goods=Good::all();
             return response()->json([
-                'goods'=>$sales,
+                'goods'=>$goods,
                 'status'=>true,
             ]);
         }
-
-        $filteredStockName = "";
-        $filteredDate = Carbon::now('GMT+3')->toDateString();
-        $selectedStockName = "";
-        $selectedDate = "";
-
-        $filteredStockName = $request->get('filteredStockName', "All Products");
-        $filteredDate = $request->get('filteredDate', "All Days");
-
-        if ($filteredDate == null) {
-            $filteredDate = "All Days";
-        }
-        $filteredStock = Stock::where(['name' => $filteredStockName])->first();
-
-        if ($filteredDate != "All Days" && $filteredStockName != "All Products") {
-            $sales = Sale::where(['stock_id' => $filteredStock->id, 'date' => $filteredDate])->latest()->paginate(10);
-        } elseif ($filteredDate == "All Days" && $filteredStockName != "All Products") {
-            $sales = Sale::where(['stock_id' => $filteredStock->id])->latest()->paginate(10);
-        } elseif ($filteredStockName == "All Products" && $filteredDate != "All Days") {
-            $sales = Sale::where('date', $filteredDate)->latest()->paginate(10);
-        } else {
-            $sales = Sale::latest()->paginate(10);
-        }
-        $selectedStockName = $filteredStockName;
-        $selectedDate = $filteredDate;
-
-        $stocks = Stock::where('status', 1)->where('quantity', '>', 0)->get();
-        $allStocks = Stock::all();
-        $products = Product::where(['status' => 1])->get();
-
-        return view('cart.index', compact('sales', 'products', 'stocks', 'allStocks', 'filteredDate', 'filteredStockName', 'selectedStockName', 'selectedDate'));
     }
 
     // SELL PRODUCT
     public function sellProduct(Request $request, $orderId)
     {
-    try {
-        $order = Order::findOrFail($orderId);
+        try {
+            $order = Order::findOrFail($orderId);
 
-        if (!$order) {
-            return response()->json(['error',"Order not found or expired expired"]);
-        }
-        $purchases = [];
-
-        foreach ($order->items as $item) {
-            $product = Product::find($item->product_id);
-            $quantity = $item->quantity;
-
-            $stock = Stock::findOrFail($product->stock_id);
-            if ($quantity > $stock->quantity) {
-               return back()->with('error',"Sorry! You can't sell " . $quantity . " " . $product->unit . " of " . $product->name . ' - ' . $product->volume . ' ' . $product->measure . ". Quantity remained is " . $stock->quantity . " " . $product->unit);
+            if (!$order) {
+                return response()->json(['error',"Order not found or expired"]);
             }
-        }
+            $goods = [];
+
+            foreach ($order->items as $item) {
+                $product = Product::find($item->product_id);
+                $quantity = $item->quantity;
+
+                $stock = Stock::findOrFail($product->stock_id);
+                if ($quantity > $stock->quantity) {
+                    return back()->with('error',"Sorry! You can't sell " . $quantity . " " . $product->unit . " of " . $product->name . ' - ' . $product->volume . ' ' . $product->measure . ". Quantity remained is " . $stock->quantity . " " . $product->unit);
+                }
+            }
 
             foreach ($order->items as $item) {
                 $product = Product::find($item->product_id);
@@ -89,6 +58,7 @@ class SaleController extends Controller
 
                 $stock = Stock::find($product->stock_id);
 
+                // dd(Auth::user()->name);
                 $attributes = [
                     'name' => $product->name,
                     'type' => $product->type,
@@ -101,12 +71,12 @@ class SaleController extends Controller
                     'user_id' => Auth::user()->id,
                     'date' => Carbon::now('GMT+3')->toDateString(),
                     'stock_id' => $product->stock_id,
-                    'good_id' => 0,
+                    'sale_id' => 0,
 
                 ];
-                $sale = Sale::create($attributes);
-                $stock->sales()->save($sale);
-                $purchases[] = $sale;
+                $good = Good::create($attributes);
+                $stock->goods()->save($good);
+                $goods[] = $good;
 
                 $newQuantity = $stock->quantity - $quantity;
                 $stock->update([
@@ -115,8 +85,8 @@ class SaleController extends Controller
                 $stock->save();
             }
             $totalAmount = 0;
-            foreach ($purchases as $purchase) {
-                $totalAmount = $totalAmount + $purchase->price;
+            foreach ($goods as $good) {
+                $totalAmount = $totalAmount + $good->price;
             }
             $attribute = [
                 'user_id' => Auth::user()->id,
@@ -126,16 +96,16 @@ class SaleController extends Controller
                 'amount_paid' => $totalAmount,
                 'date' => Carbon::now('GMT+3')->toDateString(),
             ];
-            $good = Good::create($attribute);
-            $at = ['good_id' => $good->id];
-            foreach ($purchases as $purchase) {
-                $purchase->update($at);
-                $good->purchases()->save($purchase);
+            $sale = Sale::create($attribute);
+            $at = ['sale_id' => $sale->id];
+            foreach ($goods as $good) {
+                $good->update($at);
+                $sale->goods()->save($good);
             }
                 $customer = Customer::find($order->customer_id);
                 $atr = ['customer_id' => $customer->id];
-                $good->update($atr);
-                $customer->goods()->save($good);
+                $sale->update($atr);
+                $customer->sales()->save($sale);
 
                 $order->status = 1;
                 $order->served_date = Carbon::now('GMT+3')->toDateString();
@@ -143,37 +113,42 @@ class SaleController extends Controller
                 $order->save();
                 // MESSAGE CONTENT
                 $heading  = "Ndugu mteja,\nUmenunua bidhaa zifuatazo kutoka kwetu\n";
-                $boughtGoods = [];
-                foreach ($purchases as $key => $purchasedGood) {
-                    $boughtGoods[] = ++$key . ". " . $purchasedGood->name . " " . $purchasedGood->volume . " " . $purchasedGood->measure . " - " . $purchasedGood->quantity . " " . $purchasedGood->unit . "\n";
+                $sales = [];
+                foreach ($goods as $key => $purchasedGood) {
+                    $sales[] = ++$key . ". " . $purchasedGood->name . " " . $purchasedGood->volume . " " . $purchasedGood->measure . " - " . $purchasedGood->quantity . " " . $purchasedGood->unit . "\n";
                 }
                 $totalCost = "Zinazogharimu Jumla ya TZS " . number_format($totalAmount, 0, '.', ',') . ".\n";
                 $closing  = "Ahsante na karibu tena.";
-                $messageBody = $heading . implode('', $boughtGoods) . $totalCost . $closing;
+                $messageBody = $heading . implode('', $sales) . $totalCost . $closing;
 
                 $messagingService = new MessagingService();
                 $sendMessageResponse = $messagingService->sendMessage($customer->phone, $messageBody);
 
                 if ($sendMessageResponse == "Sent") {
+                    if (REQ::is('api/*'))
+                        return response()->json(['status'=>true,'message' => 'Order served successful'],200);
                     return back()->with('success','Order successful sold');
                 } else {
+                    if (REQ::is('api/*'))
+                    return response()->json(['status'=>true, 'message' => 'Order successful sold but message not sent, crosscheck your inputs'],200);
                     return back()->with('error','Order successful sold but message not sent, crosscheck your inputs');
                 }
 
-        } catch (\Throwable $th) {
+            } catch (\Throwable $th) {
+            if (REQ::is('api/*'))
+            return response()->json([
+                'status'=>false,
+                'message' => $th], 500);
            return back()->with('error',$th->getMessage());
         }
 
 }
-
-
-
     public function allSales(Request $request)
     {
         if (REQ::is('api/*')) {
-            $goods=Good::all();
+            $sales=Sale::all();
             return response()->json([
-                'sales'=>$goods,
+                'sales'=>$sales,
                 'status'=>true,
             ]);
         }
@@ -184,36 +159,34 @@ class SaleController extends Controller
             $filteredDate = "All Days";
         }
 
-        $sales = Sale::latest()->get();
+        $goods = Good::latest()->get();
         if ($filteredDate != "All Days" && $filteredStockId != "All Products") {
-            $sales = Sale::where(['stock_id' => $filteredStockId, 'date' => $filteredDate])->latest()->get();
+            $goods = Good::where(['stock_id' => $filteredStockId, 'date' => $filteredDate])->latest()->get();
         } elseif ($filteredStockId != "All Products") {
-            $sales = Sale::where(['stock_id' => $filteredStockId])->latest()->get();
+            $goods = Good::where(['stock_id' => $filteredStockId])->latest()->get();
         } elseif ($filteredDate != "All Days") {
-            $sales = Sale::where('date', $filteredDate)->latest()->get();
+            $goods = Good::where('date', $filteredDate)->latest()->get();
         }
 
-        $boughtGoods = Good::latest()->get();
+        $sales = Sale::latest()->get();
         if ($filteredDate != "All Days") {
-            $boughtGoods = Good::where('date', $filteredDate)->latest()->get();
+            $sales = Sale::where('date', $filteredDate)->latest()->get();
         }
 
         $stocks = Stock::where('status', 1)->where('quantity', '>', 0)->get();
         $allStocks = Stock::all();
         $products = Product::where(['status' => 1])->get();
 
-        // $selectedStockName = $filteredStockName;
         $selectedDate = $filteredDate;
         return view('sales.index', compact(
-            'sales',
+            'goods',
             'stocks',
             'allStocks',
             'products',
             'filteredDate',
             'filteredStockId',
-            // 'selectedStockName',
             'selectedDate',
-            'boughtGoods'
+            'sales'
         ));
     }
 }

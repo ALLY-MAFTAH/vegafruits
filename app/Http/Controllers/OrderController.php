@@ -272,19 +272,6 @@ class OrderController extends Controller
         return response()->json(['message' => $e], 500);
     }
     }
-    public function markOrderAsServed(Request $request, $orderId)
-    {
-    try {
-        $order = Order::findOrFail($orderId);
-        $order->status = $request->input('status');
-        $order->save();
-
-        return response()->json(['message' => 'Order served successful']);
-    } catch (\Exception $e) {
-
-        return response()->json(['message' => $e], 500);
-    }
-}
 
 
     public function deleteOrder(Order $order)

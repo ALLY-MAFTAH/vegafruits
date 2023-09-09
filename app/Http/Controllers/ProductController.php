@@ -75,14 +75,25 @@ class ProductController extends Controller
 
         try {
             $attributes = $request->validate([
+                'name' => 'required',
                 'volume' => 'required',
                 'unit' => 'required',
                 'selling_price' => 'required',
                 'type' => 'required',
             ]);
 
+            if ($request->hasFile('photo')) {
+                $photoPath = $request->file('photo')->storeAs(
+                    '/images',
+                    'img-' . $request->name . '.' . $request->file('photo')->getClientOriginalExtension(),
+                    'public'
+                );
+            } else {
+                $photoPath=$product->photo;
+            }
             $attributes['stock_id'] = $stock->id;
-            $attributes['name'] = $stock->name;
+            // $attributes['name'] = $stock->name;
+            $attributes['photo'] = $photoPath;
             $attributes['has_discount'] = $request->has_discount;
 
             $product->update($attributes);

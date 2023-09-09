@@ -78,18 +78,18 @@
                     <th>Seller</th>
                 </thead>
                 <tbody>
-                    @foreach ($sales as $index => $sale)
+                    @foreach ($goods as $index => $good)
                         <tr>
                             <td>{{ ++$index }}</td>
-                            <td>{{ $sale->name . ' - ' . $sale->volume . ' ' . $sale->measure }}</td>
-                            <td>{{ $sale->quantity . ' ' . $sale->unit }}</td>
-                            <td class="text-right">{{ number_format($sale->price, 0, '.', ',') }}
+                            <td>{{ $good->name . ' - ' . $good->volume . ' ' . $good->measure }}</td>
+                            <td>{{ $good->quantity . ' ' . $good->unit }}</td>
+                            <td class="text-right">{{ number_format($good->price, 0, '.', ',') }}
                                 Tsh</td>
                             @php
-                                $totalAmount += $sale->price;
+                                $totalAmount += $good->price;
                             @endphp
-                            <td class="">{{ $sale->created_at->format('D, d M Y \a\t H:i:s') }} </td>
-                            <td>{{ $sale->seller }}</td>
+                            <td class="">{{ $good->created_at->format('D, d M Y \a\t H:i:s') }} </td>
+                            <td>{{ $good->seller }}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -133,25 +133,25 @@
                     @php
                         $total = 0;
                     @endphp
-                    @foreach ($boughtGoods as $index => $good)
+                    @foreach ($sales as $index => $sale)
                         <tr>
                             <td>{{ ++$index }}</td>
-                            <td>{{ Illuminate\Support\Carbon::parse($good->created_at)->format('D, d M Y \a\t H:i:s') }}</td>
+                            <td>{{ Illuminate\Support\Carbon::parse($sale->created_at)->format('D, d M Y \a\t H:i:s') }}</td>
                             <td>
-                                @foreach ($good->purchases as $purchase)
+                                @foreach ($sale->goods as $good)
                                     <div>
-                                        {{ $purchase->name }} {{ $purchase->volume }} {{ $purchase->measure }} -
-                                        {{ $purchase->quantity }} {{ $purchase->unit }},
+                                        {{ $good->name }} {{ $good->volume }} {{ $good->measure }} -
+                                        {{ $good->quantity }} {{ $good->unit }},
                                     </div>
                                 @endforeach
 
                             </td>
                             @php
-                                $total = $total + $good->amount_paid;
+                                $total = $total + $sale->amount_paid;
                             @endphp
-                            <td class="text-right">{{ number_format($good->amount_paid, 0, '.', ',') }} Tsh</td>
+                            <td class="text-right">{{ number_format($sale->amount_paid, 0, '.', ',') }} Tsh</td>
                             @php
-                                $customer = App\Models\Customer::find($good->customer_id);
+                                $customer = App\Models\Customer::find($sale->customer_id);
                             @endphp
                             <td>
                                 @if ($customer)
@@ -162,7 +162,7 @@
                                     Customer not recorded
                                 @endif
                             </td>
-                            <td>{{ $good->seller }}</td>
+                            <td>{{ $sale->seller }}</td>
                         </tr>
                     @endforeach
                 </tbody>

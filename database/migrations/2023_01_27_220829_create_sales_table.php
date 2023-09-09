@@ -16,15 +16,11 @@ return new class extends Migration
         Schema::create('sales', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('customer_id')->nullable();
+            $table->bigInteger('user_id');
+            $table->string('seller');
+            $table->string('receipt_number')->nullable();
             $table->date('date');
-            $table->bigInteger('product_id');
-            $table->bigInteger('stock_id');
-            $table->string('name');
-            $table->double('volume');
-            $table->string('type')->nullable();
-            $table->double('quantity');
-            $table->string('unit');
-            $table->double('price');
+            $table->double('amount_paid');
             $table->timestamps();
             $table->softDeletes();
         });

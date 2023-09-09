@@ -12,39 +12,25 @@ class Sale extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'product_id',
         'customer_id',
-        'stock_id',
-        'good_id',
         'user_id',
         'seller',
-        'name',
-        'volume',
-        'quantity',
-        'unit',
-        'price',
+        'amount_paid',
         'date',
-        'type',
+
     ];
 
     protected $dates = [
         'deleted_at'
     ];
 
-    public function user()
+
+    public function goods()
     {
-        return  $this->belongsTo(User::class);
+        return  $this->hasMany(Good::class);
     }
     public function customer()
     {
         return  $this->belongsTo(Customer::class,'customer_id');
-    }
-    public function stock()
-    {
-        return  $this->belongsTo(Stock::class, 'stock_id');
-    }
-    public function good()
-    {
-        return  $this->belongsTo(Good::class, 'good_id');
     }
 }

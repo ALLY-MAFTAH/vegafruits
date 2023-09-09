@@ -30,9 +30,9 @@ class Stock extends Model
     {
         return  $this->hasOne(Product::class);
     }
-    public function sales()
+    public function goods()
     {
-        return  $this->hasMany(Sale::class);
+        return  $this->hasMany(Good::class);
     }
     public function orders()
     {
