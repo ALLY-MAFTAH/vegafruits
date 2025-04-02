@@ -17,7 +17,6 @@ class Sale extends Model
         'seller',
         'amount_paid',
         'date',
-
     ];
 
     protected $dates = [
